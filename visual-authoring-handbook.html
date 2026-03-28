@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATK PyneScript V6 Visual Authoring Handbook</title>
+    <meta name="description" content="Handbook for choosing and authoring static visuals, ctx object visuals, and ATK bridge visuals in ATK PyneScript V6 without breaking the stage contract.">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">ATK</div>
+                <div>
+                    <p class="eyebrow">PyneScript V6</p>
+                    <h1>Visual Handbook</h1>
+                </div>
+            </div>
+            <label class="search-box" for="doc-search">
+                <span>Search handbook</span>
+                <input id="doc-search" type="search" placeholder="plot, ctx.line, fill_between, attrs, build_visuals...">
+            </label>
+            <div class="current-section-indicator" aria-live="polite">
+                <span class="current-section-label">Current section</span>
+                <strong class="current-section-value">Visual Authoring Handbook</strong>
+            </div>
+            <nav class="nav" aria-label="Visual handbook">
+                <a href="index.html">Back to main docs</a>
+                <a href="function-cookbook.html">Open function cookbook</a>
+                <a href="examples-copybook.html">Open examples copybook</a>
+                <details class="nav-group" open>
+                    <summary>Foundations</summary>
+                    <div class="sidebar-links">
+                        <a href="#layer-choice">Choose a visual layer</a>
+                        <a href="#stage-contracts">Stage contracts</a>
+                        <a href="#render-only">Render-only build_visuals</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Visual Families</summary>
+                    <div class="sidebar-links">
+                        <a href="#static-family">Static declarations</a>
+                        <a href="#object-family">ctx object namespaces</a>
+                        <a href="#native-table-family">native table namespace</a>
+                        <a href="#bridge-family">ATK bridge family</a>
+                        <a href="#profile-candle-bridge">Profile and candle bridge</a>
+                        <a href="#fill-patterns">Fill and zone patterns</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Anti-Patterns</summary>
+                    <div class="sidebar-links">
+                        <a href="#wrong-patterns">Wrong vs right</a>
+                        <a href="#attrs-slice-safety">attrs and slice safety</a>
+                    </div>
+                </details>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="hero" data-search="visual handbook plot ctx atk build_visuals handbook">
+                <div class="hero-copy">
+                    <p class="eyebrow">Mini-book for visual authoring</p>
+                    <h2>How to Pick the Right Visual Layer and Keep It Stage-Correct</h2>
+                    <p class="lead">This handbook explains the mental model behind ATK PyneScript visuals: when to stay with static declarations, when to move into object namespaces, when to use the ATK bridge, and how to keep <code>build_visuals(...)</code> render-only instead of turning it into a second compute stage.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#layer-choice">Start with layer choice</a>
+                        <a class="button" href="#wrong-patterns">Jump to wrong vs right</a>
+                        <a class="button" href="function-cookbook.html#plot-family-recipes">Open plot cookbook</a>
+                        <a class="button" href="examples-copybook.html#visual-starter">Open visual starter</a>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="stat-grid">
+                        <article><span>First decision</span><strong>Static vs object vs bridge</strong></article>
+                        <article><span>Main risk</span><strong>Compute leaking into render stage</strong></article>
+                        <article><span>Best guardrail</span><strong>Prepared frame, render-only visuals</strong></article>
+                        <article><span>Companion pages</span><strong>Cookbook plus copybook</strong></article>
+                    </div>
+                </div>
+            </header>
+
+            <section class="doc-section" id="layer-choice" data-search="choose visual layer plot ctx atk static object bridge">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Choose a Visual Layer Before Writing Code</h2>
+                </div>
+                <div class="code-block" data-title="Visual layer decision tree">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>Do you have one value or marker per row?
+|- Yes -> use static declarations: plot, hline, plotshape, plotchar, plotarrow, fill, linefill.new
+|- No  -> use an object-like visual path
+       |- Simple chart object? -> ctx.line, ctx.label, ctx.box, ctx.polyline, ctx.table
+       |- ATK-native grouped or composite renderer? -> ctx.atk.plot_line, ctx.atk.fill_between, ctx.atk.table, ctx.atk.rectangles, ctx.atk.volume_profile
+
+Already drawing your lines with ctx.atk.plot_line?
+|- Yes -> ctx.atk.fill_between
+|- No  -> fill or linefill.new</code></pre>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="card">
+                        <h3>Static declarations</h3>
+                        <p>Best when the visual can be described by columns already present in the frame. This is the cleanest path for most indicators.</p>
+                    </article>
+                    <article class="card">
+                        <h3>ctx object namespaces</h3>
+                        <p>Best when the visual is an object with coordinates, text, geometry, or mutating endpoints rather than a simple row-aligned series.</p>
+                    </article>
+                    <article class="card">
+                        <h3>ATK bridge</h3>
+                        <p>Best when the visual is richer than one object or when the repo already exposes a higher-level helper such as profiles, rectangle batches, tables, or bridge line fills.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="doc-section" id="stage-contracts" data-search="stage contracts build_indicator_frame build_signal_frame build_trade_frame build_visuals">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Stage Contracts for Visual Authors</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Stage</th><th>Owns</th><th>Must not do</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>build_indicator_frame</code></td><td>Indicator computation, prepared visual columns, static attrs config.</td><td>Render objects directly.</td></tr>
+                            <tr><td><code>build_signal_frame</code></td><td>Strategy computation, MTF helpers, mapped execution intent.</td><td>Delay risk, entries, or resampling into later stages.</td></tr>
+                            <tr><td><code>build_trade_frame</code></td><td>Mapping or delegation to <code>build_mapped_trade_frame(...)</code>.</td><td>Run TA, request calls, or invent strategy logic.</td></tr>
+                            <tr><td><code>build_visuals</code></td><td>Rendering from prepared data and current frame slice.</td><td>Compute indicators, mutate input frames, or depend on stale attrs-only coordinates.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <strong>Practical test:</strong> if you could delete <code>build_visuals</code> and still preserve all computed columns and strategy intent, your stage split is probably correct. If deleting it removes calculations, those calculations belong earlier.
+                </div>
+            </section>
+
+            <section class="doc-section" id="render-only" data-search="render-only build_visuals attrs frame slice ctx render only">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Keep build_visuals(...) Render-Only</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3>What belongs here</h3>
+                        <p>Reading the last rows, picking anchors, unpacking static attrs config, and emitting <code>ctx.*</code> or <code>ctx.atk.*</code> intents.</p>
+                    </article>
+                    <article class="card">
+                        <h3>What does not belong here</h3>
+                        <p>TA calls, resampling, groupby logic, frame mutation, and any preparation that could have been done deterministically in the frame builder.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="Render-only visual starter pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["ema_fast"] = ta.ema(frame["close"], 20)
+    frame["buy_signal"] = ta.crossover(frame["close"], frame["ema_fast"]).fillna(False)
+    frame.attrs["label_style"] = {"color": "#2962ff", "style": "label_down"}
+    return frame
+
+
+def build_visuals(frame, params=None, ctx=None):
+    if frame is None or frame.empty or ctx is None:
+        return None
+    last = frame.iloc[-1]
+    style = dict(frame.attrs.get("label_style") or {})
+    if bool(last.get("buy_signal", False)):
+        return ctx.label.new(
+            key="last_buy_label",
+            x=int(last["index"]),
+            y=float(last["low"]),
+            text="BUY",
+            **style,
+        )
+    return None</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="static-family" data-search="static family plot plotshape fill linefill hline">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>Static Declarations: Default Choice for Most Indicators</h2>
+                </div>
+                <p class="section-text">Use static declarations when a column in the prepared frame already describes the line, marker, or threshold you want to render. This gives you the cleanest code and the strongest alignment between compute and display.</p>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#plot-family-recipes">Open plot-family cookbook</a>
+                    <a class="copy-link" href="examples/pynescript_bbands_fill_indicator.py" download>Download BBands example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="object-family" data-search="object family ctx line label box chart point">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>ctx Object Namespaces: When the Visual Is an Object</h2>
+                </div>
+                <p class="section-text">Choose object namespaces when you need endpoints, bounds, labels, or shapes that are not naturally represented as one value per row. The object still has to come from prepared data; only the object assembly happens here.</p>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#chart-point-recipes">Open chart.point cookbook</a>
+                    <a class="copy-link" href="examples-copybook.html#chart-point">Open chart.point example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="native-table-family" data-search="native table table.new table.cell ctx.table dashboard widgets">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>Native Table Namespace: Use It Before Reaching for the ATK Table Bridge</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3>Choose native tables when</h3>
+                        <p>You need a simple managed widget with rows, columns, and cell text that can be expressed directly through <code>table.new</code>, <code>table.cell</code>, or <code>ctx.table.new</code>.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Choose the ATK bridge when</h3>
+                        <p>The visual is a richer composite dashboard or you already rely on ATK-native layout helpers. The bridge is stronger for grouped payloads, while native tables are the cleanest first choice for plain widgets.</p>
+                    </article>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#table-recipes">Open table cookbook</a>
+                    <a class="copy-link" href="examples/pynescript_native_table_indicator.py" download>Download native table example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="bridge-family" data-search="bridge family ctx atk plot_line fill_between table rectangles volume profile">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>ATK Bridge: Use It for Composite or Native Renderers</h2>
+                </div>
+                <p class="section-text">Use <code>ctx.atk.*</code> when the repo already gives you a higher-level renderer that would be awkward to rebuild from raw objects. The bridge is especially useful for plot-line pairs, fill bands, tables, rectangles, volume profiles, and grouped shapes.</p>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#bridge-recipes">Open bridge cookbook</a>
+                    <a class="copy-link" href="examples-copybook.html#atk-table">Open ATK table example</a>
+                    <a class="copy-link" href="examples/pynescript_atk_plot_fill_bridge.py" download>Download fill-between bridge example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="profile-candle-bridge" data-search="profile candle bridge candlestick horizontal bar dual horizontal bar fixed atk composite visuals">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>Profile and Candle Bridge: Composite Visuals Done the Safe Way</h2>
+                </div>
+                <p class="section-text">One of the newer examples in the source tree combines three different ATK bridge renderers in a single render-only stage: a compact candle bundle, a horizontal profile, and a dual-profile overlay. This is the pattern to study when one visual idea naturally resolves into a grouped payload instead of one plot or one object.</p>
+                <div class="code-block" data-title="Composite bridge payload with candles and profiles">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_visuals(frame, params=None, ctx=None):
+    payload = dict(frame.attrs.get("visual_profile_payload") or {})
+    tail = frame.tail(int(payload.get("tail_size") or 4)).reset_index(drop=True)
+    if tail.empty:
+        return []
+
+    last_index = float(tail.iloc[-1]["index"])
+    y_levels = [float(value) for value in tail["close"].tolist()]
+    return [
+        ctx.atk.candlestick(
+            key="atk_sub_candles",
+            x=[float(value) for value in tail["index"].tolist()],
+            open=[float(value) for value in tail["open"].tolist()],
+            high=[float(value) for value in tail["high"].tolist()],
+            low=[float(value) for value in tail["low"].tolist()],
+            close=[float(value) for value in tail["close"].tolist()],
+        ),
+        ctx.atk.horizontal_bar(key="atk_horizontal_profile", x=last_index + 4.0, y=y_levels, **dict(payload.get("horizontal_bar") or {})),
+        ctx.atk.dual_horizontal_bar_fixed(key="atk_dual_profile", xData=last_index + 8.0, yData=y_levels, **dict(payload.get("dual_horizontal_bar_fixed") or {})),
+    ]</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_atk_profile_candle_bridge.py" download>Download profile and candle bridge example</a>
+                    <a class="copy-link" href="examples/pynescript_visual_settings_lifecycle_demo.py" download>Download lifecycle demo</a>
+                    <a class="copy-link" href="function-cookbook.html#bridge-recipes">Open bridge cookbook</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="fill-patterns" data-search="fill patterns fill linefill fill_between bands zones">
+                <div class="section-head">
+                    <p class="eyebrow">Visual families</p>
+                    <h2>Fill and Zone Patterns</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Need</th><th>Recommended API</th><th>Why</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Fill between two static lines</td><td><code>fill(...)</code> or <code>linefill.new(...)</code></td><td>Use when the paired lines already exist as static declarations.</td></tr>
+                            <tr><td>Fill between ATK bridge lines</td><td><code>ctx.atk.fill_between(...)</code></td><td>Use when the lines were created through <code>ctx.atk.plot_line</code>.</td></tr>
+                            <tr><td>Zone batch or rectangle family</td><td><code>ctx.atk.rectangles(...)</code> or related bridge helper</td><td>Use when the visual is more like a grouped region than a line pair.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="wrong-patterns" data-search="wrong vs right visual authoring anti patterns">
+                <div class="section-head">
+                    <p class="eyebrow">Anti-patterns</p>
+                    <h2>Wrong vs Right for Common Authoring Mistakes</h2>
+                </div>
+                <div class="code-block" data-title="Choosing the wrong visual family">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: create object machinery for a simple row-aligned line.
+def build_visuals(frame, params=None, ctx=None):
+    return ctx.line.new(key="ema_line", x1=0, y1=100, x2=10, y2=101)
+
+
+# Right: if the frame already has one value per row, stay with plot(...).
+plot("ema_fast", key="ema_fast", title="EMA Fast", color="#00c853", width=2)</code></pre>
+                </div>
+                <div class="code-block" data-title="Mixing static and bridge fill identities">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: trying to fill between static keys with the bridge helper.
+# ctx.atk.fill_between(line1="bb_upper", line2="bb_lower", ...)
+
+# Right: bridge fills between bridge line keys.
+ctx.atk.plot_line(key="fast_line", source="fast", color="#00c853")
+ctx.atk.plot_line(key="slow_line", source="slow", color="#f23645")
+ctx.atk.fill_between(key="trend_fill", line1="fast_line", line2="slow_line", fill_alpha=24)</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="attrs-slice-safety" data-search="attrs slice safety stale attrs dynamic coordinates">
+                <div class="section-head">
+                    <p class="eyebrow">Anti-patterns</p>
+                    <h2>attrs Are for Static Config, Not Frozen Coordinates</h2>
+                </div>
+                <p class="section-text">The safe rule is simple: colors, headers, labels, and other stable config can live in <code>frame.attrs</code>. Coordinates, tail-derived anchors, and current slice geometry should be derived from the frame passed into <code>build_visuals</code>. Otherwise historic or sliced rendering can reuse stale payloads.</p>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#build-visuals-wrong-right">Open build_visuals wrong vs right</a>
+                    <a class="copy-link" href="examples/pynescript_visual_indicator_starter.py" download>Download visual starter source</a>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>

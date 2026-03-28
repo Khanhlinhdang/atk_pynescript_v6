@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATK PyneScript V6 Strategy Authoring Handbook</title>
+    <meta name="description" content="Handbook for designing PyneScript strategies in ATK with strict build_signal_frame ownership, mapping-only build_trade_frame, request.security placement, and canonical trade-frame field design.">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">ATK</div>
+                <div>
+                    <p class="eyebrow">PyneScript V6</p>
+                    <h1>Strategy Handbook</h1>
+                </div>
+            </div>
+            <label class="search-box" for="doc-search">
+                <span>Search handbook</span>
+                <input id="doc-search" type="search" placeholder="trade frame fields, build_signal_frame, request.security, sl tp...">
+            </label>
+            <div class="current-section-indicator" aria-live="polite">
+                <span class="current-section-label">Current section</span>
+                <strong class="current-section-value">Strategy Authoring Handbook</strong>
+            </div>
+            <nav class="nav" aria-label="Strategy handbook">
+                <a href="index.html">Back to main docs</a>
+                <a href="function-cookbook.html">Open function cookbook</a>
+                <a href="examples-copybook.html">Open examples copybook</a>
+                <details class="nav-group" open>
+                    <summary>Foundations</summary>
+                    <div class="sidebar-links">
+                        <a href="#stage-split">Stage split</a>
+                        <a href="#nautilus-order-flow">PyneScript to Nautilus flow</a>
+                        <a href="#trade-frame-fields">trade frame fields</a>
+                        <a href="#intent-helper-surface">Intent helper surface</a>
+                        <a href="#mtf-patterns">MTF and request.security</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Execution Mapping</summary>
+                    <div class="sidebar-links">
+                        <a href="#order-type-matrix">Order-type matrix</a>
+                        <a href="#entry-fields">Entry fields</a>
+                        <a href="#risk-fields">Bracket risk fields</a>
+                        <a href="#trailing-fields">Trailing fields</a>
+                        <a href="#reduce-tif-fields">Reduce-only and TIF</a>
+                        <a href="#execution-realism">Execution realism</a>
+                        <a href="#alert-payloads">Alert payloads</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Strategy Design</summary>
+                    <div class="sidebar-links">
+                        <a href="#entry-design">Entry design</a>
+                        <a href="#risk-design">Risk and exits</a>
+                        <a href="#sizing-design">Sizing decisions</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Anti-Patterns</summary>
+                    <div class="sidebar-links">
+                        <a href="#wrong-right">Wrong vs right</a>
+                        <a href="#copy-paths">Best starter paths</a>
+                    </div>
+                </details>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="hero" data-search="strategy handbook trade frame fields request security build_signal_frame build_trade_frame">
+                <div class="hero-copy">
+                    <p class="eyebrow">Mini-book for strategy design</p>
+                    <h2>How to Build Strategies Without Leaking Logic Across Stages</h2>
+                    <p class="lead">This handbook focuses on the most common PyneScript strategy mistakes in ATK: putting logic in the wrong stage, treating trade-frame fields as an afterthought, and sneaking MTF or risk calculations into <code>build_trade_frame(...)</code>. The safe pattern is simple once the stage ownership is explicit.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#stage-split">Start with the stage split</a>
+                        <a class="button" href="#order-type-matrix">Order-type matrix</a>
+                        <a class="button" href="#entry-fields">Execution mapping encyclopedia</a>
+                        <a class="button" href="#wrong-right">Jump to wrong vs right</a>
+                        <a class="button" href="function-cookbook.html#trade-frame-recipes">Open trade-frame cookbook</a>
+                        <a class="button" href="examples-copybook.html#starter-strategy">Open strategy starter</a>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="stat-grid">
+                        <article><span>Core rule</span><strong>Signals first, mapping second</strong></article>
+                        <article><span>MTF rule</span><strong>request.security stays in signal stage</strong></article>
+                        <article><span>Risk rule</span><strong>SL/TP/trailing are strategy intent</strong></article>
+                        <article><span>Starter examples</span><strong>Strategy starter and MTF confirmation</strong></article>
+                    </div>
+                </div>
+            </header>
+
+            <section class="doc-section" id="stage-split" data-search="stage split build_signal_frame build_trade_frame strategy stages">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Separate Strategy Thinking from Trade Mapping</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Stage</th><th>Owns</th><th>Must not do</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>build_signal_frame</code></td><td>Indicators, filters, entries, exits, MTF context, canonical trade-frame fields.</td><td>Defer strategy intent into later stages.</td></tr>
+                            <tr><td><code>build_trade_frame</code></td><td>Thin normalization, usually <code>build_mapped_trade_frame(signal_df)</code> or equivalent canonical normalizer.</td><td>Compute TA, call <code>request.security</code>, or invent stop/target/sizing logic.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <strong>Practical test:</strong> if you can explain your strategy only by reading <code>build_signal_frame</code>, the design is healthy. If the behavior is split across both builders, the contract is already drifting.
+                </div>
+            </section>
+
+            <section class="doc-section" id="nautilus-order-flow" data-search="pynescript nautilus flow backtest replay live order intent">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>PyneScript Strategy to Backtest to Live: One Canonical Flow</h2>
+                </div>
+                <div class="code-block" data-title="Canonical order flow">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>build_signal_frame(...)
+  -> emit entry_* / sl / tp / trail_offset
+  -> build_trade_frame(...) returns build_mapped_trade_frame(signal_df)
+  -> normalize_strategy_trade_frame(...)
+  -> execution core builds OrderIntent
+  -> ExecutionPolicyEngine pre_trade_check(...)
+  -> batch backtest / replay / live session submit path
+  -> unified order primitives and reports</code></pre>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3>What is unified already</h3>
+                        <p>The strategy layer uses one canonical trade-frame schema, one normalizer, and one execution-domain intent model before dispatch. That is the core contract shared by batch simulation, replay, and live signal execution.</p>
+                    </article>
+                    <article class="card">
+                        <h3>What to keep explicit</h3>
+                        <p>PyneScript strategy authors should target the canonical trade-frame schema first, not adapter-specific order factories. That keeps strategy code portable across backtest, replay, and live execution paths.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="doc-section" id="trade-frame-fields" data-search="trade frame fields entry_side sl tp trail_offset canonical trade columns">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Design Canonical Trade-Frame Fields Deliberately</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Field</th><th>Use it when</th><th>Design advice</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>entry_side</code></td><td>The row truly wants an entry.</td><td>Keep it sparse and explicit. Empty string is better than implied direction.</td></tr>
+                            <tr><td><code>entry_price</code></td><td>You know the intended entry basis.</td><td>Match it to actual strategy timing: open, close, trigger, or limit series.</td></tr>
+                            <tr><td><code>quantity</code></td><td>Units are known directly.</td><td>Do not also express the same intent through <code>size_pct</code> unless the runtime expects one to stay neutral.</td></tr>
+                            <tr><td><code>sl</code> and <code>tp</code></td><td>The strategy has bracket-style risk exits.</td><td>Think of them as part of the signal decision, not a mapping convenience.</td></tr>
+                            <tr><td><code>trail_offset</code></td><td>The strategy genuinely trails.</td><td>Only emit it when trailing is real, not because the field exists in the schema.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#trade-frame-recipes">Open trade-frame cookbook</a>
+                    <a class="copy-link" href="examples-copybook.html#starter-strategy">Open starter strategy</a>
+                    <a class="copy-link" href="../docs/trade_frame_sync_matrix.md">Open trade-frame sync matrix</a>
+                    <a class="copy-link" href="../docs/pynescript_trade_frame_order_lookup.md">Open trade-frame order lookup</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="intent-helper-surface" data-search="strategy entry order exit close cancel helper surface mapped canonical path">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Intent Helpers Are Supported, But Trade-Frame Fields Stay Canonical</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3>What the helpers are for</h3>
+                        <p><code>strategy.entry/order/exit/close/cancel*</code> build explicit payload dictionaries and are part of the supported runtime surface. They are useful for templates, diagnostics, metadata-rich examples, and future-facing authoring consistency.</p>
+                    </article>
+                    <article class="card">
+                        <h3>What still drives execution</h3>
+                        <p>The current ATK execution pipeline still expects real strategy intent to be emitted through canonical trade-frame fields in <code>build_signal_frame(...)</code>, then normalized by <code>build_trade_frame(...)</code>. Do not replace that flow with helper payloads in production examples.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="Supported helper surface vs canonical execution path">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Supported helper payload.
+entry_template = strategy.entry("L", "BUY", when=True, limit=100.0)
+
+
+# Canonical ATK execution path.
+frame["entry_side"] = "BUY"
+frame["entry_price"] = frame["open"]
+frame["quantity"] = 1.0
+frame["size_pct"] = 0.0</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_strategy_intent_surface.py" download>Download intent-surface example</a>
+                    <a class="copy-link" href="function-cookbook.html#strategy-intent-recipes">Open intent cookbook</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="order-type-matrix" data-search="order type matrix market limit stop market stop limit nautilus">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Order-Type Matrix Aligned to the Unified Execution Core</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>PyneScript trade-frame contract</th><th>Required fields</th><th>Execution-core meaning</th><th>Alignment note</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>MARKET</code></td><td><code>entry_order_type</code>, <code>entry_price</code></td><td>Immediate market-style intent.</td><td>Maps directly to market-style core execution and is the safest cross-mode default.</td></tr>
+                            <tr><td><code>LIMIT</code></td><td><code>entry_order_type</code>, <code>entry_limit_price</code></td><td>Price-capped passive or resting intent.</td><td>The canonical passive-price field is <code>entry_limit_price</code>.</td></tr>
+                            <tr><td><code>STOP_MARKET</code></td><td><code>entry_order_type</code>, <code>entry_trigger_price</code></td><td>Trigger first, then market execution.</td><td>Stable across replay, backtest, and live adapters.</td></tr>
+                            <tr><td><code>STOP_LIMIT</code></td><td><code>entry_order_type</code>, <code>entry_trigger_price</code>, <code>entry_limit_price</code></td><td>Trigger first, then submit a limit order.</td><td>The current core keeps the distinction in replay/backtest and venue-capable live paths.</td></tr>
+                            <tr><td><code>BRACKET</code> entry</td><td>Do not emit as a trade-frame entry type.</td><td>Use a normal entry type plus <code>sl</code> and <code>tp</code>.</td><td>This stays closer to the normalized execution contract.</td></tr>
+                            <tr><td><code>TRAILING_STOP_MARKET</code> entry</td><td>Do not teach it as the primary entry type in the strategy layer.</td><td>Use a normal entry plus <code>trail_offset</code>.</td><td>Trailing is modeled through dedicated protective fields.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <strong>Important:</strong> if you want portability across PyneScript strategy backtest, replay, and live signal execution, treat <code>MARKET</code>, <code>LIMIT</code>, <code>STOP_MARKET</code>, and <code>STOP_LIMIT</code> as the stable entry-type subset. Use dedicated trade-frame risk fields for bracket and trailing behavior.
+                </div>
+            </section>
+
+            <section class="doc-section" id="entry-fields" data-search="entry fields entry_side entry_price quantity size_pct">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Entry Fields: Direction, Price, and Sizing Base</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Field</th><th>Purpose</th><th>Practical rule</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>entry_side</code></td><td>Trade direction intent.</td><td>Emit only on rows where a new entry actually exists. Empty string is safer than implicit carry-forward behavior.</td></tr>
+                            <tr><td><code>entry_price</code></td><td>Price basis for the order.</td><td>Choose the series that matches your timing assumption: <code>open</code>, <code>close</code>, trigger, or limit basis.</td></tr>
+                            <tr><td><code>quantity</code></td><td>Absolute size.</td><td>Use for unit-based sizing. Keep <code>size_pct</code> neutral when quantity is the primary sizing model.</td></tr>
+                            <tr><td><code>size_pct</code></td><td>Relative size.</td><td>Use when the strategy sizes by percent of capital or policy budget. Avoid mixing active quantity and active percent sizing in the same simple example.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_strategy_starter.py" download>Download starter strategy</a>
+                    <a class="copy-link" href="examples/pynescript_sma_crossover_strategy.py" download>Download SMA crossover strategy</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="order-type-examples" data-search="market limit stop market stop limit examples strategy code">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Order-Type Examples You Can Adapt Directly</h2>
+                </div>
+                <div class="code-block" data-title="MARKET entry example">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>frame["entry_side"] = np.where(frame["buy_signal"], "BUY", np.where(frame["sell_signal"], "SELL", ""))
+frame["entry_order_type"] = "MARKET"
+frame["entry_price"] = frame["open"]
+frame["quantity"] = 1.0</code></pre>
+                </div>
+                <div class="code-block" data-title="LIMIT entry example">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>frame["entry_side"] = np.where(frame["buy_signal"], "BUY", "")
+frame["entry_order_type"] = "LIMIT"
+frame["entry_price"] = frame["close"]
+frame["entry_limit_price"] = frame["close"] * 0.998
+frame["quantity"] = 1.0</code></pre>
+                </div>
+                <div class="code-block" data-title="STOP_MARKET entry example">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>frame["entry_side"] = np.where(frame["breakout_signal"], "BUY", "")
+frame["entry_order_type"] = "STOP_MARKET"
+frame["entry_price"] = frame["close"]
+frame["entry_trigger_price"] = frame["high"].rolling(5).max()
+frame["quantity"] = 1.0</code></pre>
+                </div>
+                <div class="code-block" data-title="STOP_LIMIT entry example">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>frame["entry_side"] = np.where(frame["breakout_signal"], "BUY", "")
+frame["entry_order_type"] = "STOP_LIMIT"
+frame["entry_price"] = frame["close"]
+frame["entry_trigger_price"] = frame["high"].rolling(5).max()
+frame["entry_limit_price"] = frame["entry_trigger_price"] * 1.001
+frame["quantity"] = 1.0</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="risk-fields" data-search="risk fields sl tp bracket strategy">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Bracket Risk Fields: sl and tp</h2>
+                </div>
+                <p class="section-text">These fields express protective intent. They belong in <code>build_signal_frame(...)</code> because they depend on the same strategic context as the entry itself: structure, ATR, volatility regime, or bracket policy.</p>
+                <div class="code-block" data-title="Bracket field pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>frame["sl"] = np.where(
+    frame["entry_side"] == "BUY",
+    frame["entry_price"] - (frame["atr"] * sl_mult),
+    np.where(frame["entry_side"] == "SELL", frame["entry_price"] + (frame["atr"] * sl_mult), 0.0),
+)
+frame["tp"] = np.where(
+    frame["entry_side"] == "BUY",
+    frame["entry_price"] + (frame["atr"] * tp_mult),
+    np.where(frame["entry_side"] == "SELL", frame["entry_price"] - (frame["atr"] * tp_mult), 0.0),
+)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_bracket_strategy.py" download>Download bracket strategy</a>
+                    <a class="copy-link" href="function-cookbook.html#trade-frame-recipes">Open trade-frame cookbook</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="trailing-fields" data-search="trailing fields trail_offset trailing stop strategy">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Trailing Fields: trail_offset</h2>
+                </div>
+                <p class="section-text">A trailing offset should mean exactly one thing: the live distance used by the strategy's trailing logic. Do not emit it as a decorative extra field. If the strategy is not genuinely trailing, leave it out.</p>
+                <div class="code-block" data-title="Trailing offset pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>atr_value = ta.atr(frame, int(p["atr_length"]))
+frame["atr"] = atr_value
+frame["trail_offset"] = frame["atr"] * float(p["trail_mult"])</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_trailing_stop_strategy.py" download>Download trailing strategy</a>
+                    <a class="copy-link" href="examples-manifest.html#strategies">Open strategy manifest section</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="reduce-tif-fields" data-search="reduce only time in force reduce_only time_in_force">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Reduce-Only and Time-in-Force Fields</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Field</th><th>Use it when</th><th>Guidance</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>reduce_only</code></td><td>The order must only reduce exposure.</td><td>Emit it only in strategies that intentionally distinguish add-exposure versus reduce-exposure behavior. Do not set it preemptively in basic examples.</td></tr>
+                            <tr><td><code>time_in_force</code></td><td>Order lifetime matters.</td><td>Use it when the execution venue or policy meaningfully distinguishes GTC, IOC, FOK, or similar order persistence rules. Treat <code>GTC</code> as the stable default unless the full live adapter path for your venue has been verified.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <strong>Current guidance:</strong> these fields are part of the canonical trade-frame schema. For portable teaching examples, prefer <code>GTC</code> and leave <code>reduce_only</code> false unless the strategy is explicitly a reduce-only management flow.
+                </div>
+            </section>
+
+            <section class="doc-section" id="execution-realism" data-search="execution realism slippage commission margin pyramiding default_qty backtest_fill_limits_assumption strategy properties">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Execution Realism Properties Belong in the Teaching Surface</h2>
+                </div>
+                <p class="section-text">The current example suite now has dedicated strategies for slippage, commission, margin, pyramiding, and limit-fill assumptions. That means these properties are no longer just internal runtime knobs. They are part of the authoring contract users should actually learn.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Property</th><th>Why you would set it</th><th>Example file</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>slippage</code></td><td>Model less optimistic fills in backtest and replay.</td><td><code>pynescript_slippage_strategy.py</code></td></tr>
+                            <tr><td><code>commission_type</code>, <code>commission_value</code></td><td>Express cash-per-order or similar fee assumptions directly in the declaration.</td><td><code>pynescript_commission_strategy.py</code></td></tr>
+                            <tr><td><code>default_qty_type</code>, <code>default_qty_value</code>, <code>margin_long</code>, <code>margin_short</code></td><td>Control percent sizing and margin assumptions without hiding them in comments.</td><td><code>pynescript_margin_strategy.py</code></td></tr>
+                            <tr><td><code>pyramiding</code></td><td>Allow staged add-on entries in the same direction.</td><td><code>pynescript_pyramiding_strategy.py</code></td></tr>
+                            <tr><td><code>backtest_fill_limits_assumption</code></td><td>Teach stricter backtest handling for limit orders.</td><td><code>pynescript_limit_fill_assumption_strategy.py</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Declaration-level realism controls">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>strategy(
+    "Limit Fill Assumption Strategy",
+    overlay=True,
+    backtest_fill_limits_assumption=1,
+    slippage=2,
+    commission_type="cash_per_order",
+    commission_value=5,
+    pyramiding=1,
+    process_orders_on_close=True,
+)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_slippage_strategy.py" download>Download slippage example</a>
+                    <a class="copy-link" href="examples/pynescript_commission_strategy.py" download>Download commission example</a>
+                    <a class="copy-link" href="examples/pynescript_margin_strategy.py" download>Download margin example</a>
+                    <a class="copy-link" href="examples/pynescript_limit_fill_assumption_strategy.py" download>Download limit-fill example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="alert-payloads" data-search="strategy alerts strategy_alert_message alert_message tag comment">
+                <div class="section-head">
+                    <p class="eyebrow">Execution mapping encyclopedia</p>
+                    <h2>Alert Templates and Human-Readable Metadata</h2>
+                </div>
+                <p class="section-text">Current strategy docs should teach both the script-level template and the row-level metadata. Use <code>strategy_alert_message(...)</code> for the reusable shell, and keep per-row context in <code>tag</code>, <code>comment</code>, and <code>alert_message</code>.</p>
+                <div class="code-block" data-title="Template plus row-level alert metadata">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import build_mapped_trade_frame, strategy, strategy_alert_message, ta
+
+
+strategy("Alert Template Strategy", overlay=True, process_orders_on_close=True)
+strategy_alert_message("{{ticker}} {{strategy.order.id}} {{strategy.order.action}}")
+
+
+def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    ema_fast = ta.ema(frame["close"], 9)
+    ema_slow = ta.ema(frame["close"], 21)
+    buy_signal = ta.crossover(ema_fast, ema_slow).fillna(False)
+
+    frame["entry_side"] = buy_signal.map({True: "BUY", False: ""})
+    frame["entry_price"] = frame["open"]
+    frame["quantity"] = 1.0
+    frame["size_pct"] = 0.0
+    frame["tag"] = buy_signal.map({True: "EMA-LONG", False: ""})
+    frame["alert_message"] = buy_signal.map({True: "ema crossover fired", False: ""})
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_strategy_alert_template_strategy.py" download>Download alert template strategy</a>
+                    <a class="copy-link" href="function-cookbook.html#trade-frame-recipes">Open trade-frame cookbook</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="mtf-patterns" data-search="mtf patterns request.security higher timeframe strategy">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>MTF Context Belongs in the Signal Stage</h2>
+                </div>
+                <p class="section-text">If a strategy uses a higher-timeframe trend, regime, or confirmation filter, that filter is part of the strategy logic. It therefore belongs in <code>build_signal_frame(...)</code> next to the local entry conditions, not inside <code>build_trade_frame(...)</code>.</p>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="function-cookbook.html#request-recipes">Open request.security cookbook</a>
+                    <a class="copy-link" href="examples-copybook.html#mtf-strategy">Open MTF strategy example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="entry-design" data-search="entry design strategy side price trigger limit">
+                <div class="section-head">
+                    <p class="eyebrow">Strategy design</p>
+                    <h2>Design Entries as Explicit Intent</h2>
+                </div>
+                <p class="section-text">Do not let entries emerge accidentally from downstream mapping. Decide the entry direction, timing, and price basis in the signal stage, then emit only the trade-frame fields that represent that decision.</p>
+            </section>
+
+            <section class="doc-section" id="risk-design" data-search="risk design sl tp trail offset strategy">
+                <div class="section-head">
+                    <p class="eyebrow">Strategy design</p>
+                    <h2>Risk and Exits Are Part of Strategy Logic</h2>
+                </div>
+                <p class="section-text">Stops, targets, and trailing offsets are not formatting steps. They reflect how the strategy thinks about risk. Compute them in <code>build_signal_frame(...)</code> from ATR, structure, or fixed rules and keep the trade frame thin.</p>
+            </section>
+
+            <section class="doc-section" id="sizing-design" data-search="sizing design quantity size pct">
+                <div class="section-head">
+                    <p class="eyebrow">Strategy design</p>
+                    <h2>Choose One Sizing Story per Strategy</h2>
+                </div>
+                <p class="section-text">Most confusion around strategy sizing comes from mixing unit-based and percent-based thinking. Pick one primary sizing model, emit the corresponding field clearly, and keep the other field neutral unless the runtime requires both to be present.</p>
+            </section>
+
+            <section class="doc-section" id="wrong-right" data-search="wrong right build_trade_frame request security trade frame strategy anti pattern">
+                <div class="section-head">
+                    <p class="eyebrow">Anti-patterns</p>
+                    <h2>Wrong vs Right for Strategy Authoring</h2>
+                </div>
+                <div class="code-block" data-title="build_trade_frame wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: build_trade_frame becomes a second compute stage.
+def build_trade_frame(signal_df, params=None, styles=None):
+    frame = signal_df.copy()
+    frame["sl"] = frame["close"] - ta.atr(frame["high"], frame["low"], frame["close"], 14)
+    return build_mapped_trade_frame(frame)
+
+
+# Right: compute all strategy intent first, then map only.
+def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    atr = ta.atr(frame["high"], frame["low"], frame["close"], 14)
+    frame["sl"] = frame["close"] - atr
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="code-block" data-title="MTF filter wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: HTF confirmation is delayed into mapping.
+# Right: request.security is part of signal logic and belongs with entries.</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="copy-paths" data-search="copy paths starter strategy mtf starter">
+                <div class="section-head">
+                    <p class="eyebrow">Anti-patterns</p>
+                    <h2>Best Starter Paths</h2>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples-copybook.html#starter-strategy">Start from strategy starter</a>
+                    <a class="copy-link" href="examples/pynescript_bracket_strategy.py" download>Then study bracket strategy</a>
+                    <a class="copy-link" href="examples/pynescript_trailing_stop_strategy.py" download>Then study trailing strategy</a>
+                    <a class="copy-link" href="examples/pynescript_strategy_alert_template_strategy.py" download>Then add alert template strategy</a>
+                    <a class="copy-link" href="examples/pynescript_slippage_strategy.py" download>Then add realism properties</a>
+                    <a class="copy-link" href="examples-copybook.html#mtf-strategy">Move to MTF confirmation</a>
+                    <a class="copy-link" href="examples/pynescript_strategy_starter.py" download>Download starter source</a>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>

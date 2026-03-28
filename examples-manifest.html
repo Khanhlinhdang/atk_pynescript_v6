@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATK PyneScript V6 Example Manifest</title>
+    <meta name="description" content="Categorized manifest of source/example_user_scripts used by the ATK PyneScript V6 documentation site.">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">ATK</div>
+                <div>
+                    <p class="eyebrow">PyneScript V6</p>
+                    <h1>Examples Manifest</h1>
+                </div>
+            </div>
+            <label class="search-box" for="doc-search">
+                <span>Search examples</span>
+                <input id="doc-search" type="search" placeholder="table, MTF, MACD, volume profile...">
+            </label>
+            <div class="current-section-indicator" aria-live="polite">
+                <span class="current-section-label">Current section</span>
+                <strong class="current-section-value">ATK PyneScript Example Manifest</strong>
+            </div>
+            <nav class="nav" aria-label="Manifest">
+                <a href="index.html">Back to main docs</a>
+                <details class="nav-group" open>
+                    <summary>Foundations</summary>
+                    <div class="sidebar-links">
+                        <a href="#starters">Starters</a>
+                        <a href="#runtime-surfaces">Runtime surfaces</a>
+                        <a href="#subpanel">Sub-panel</a>
+                        <a href="#visuals">Visual and ATK bridge</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Chart Structures</summary>
+                    <div class="sidebar-links">
+                        <a href="#candles">Candles and profiles</a>
+                        <a href="#mtf">MTF and request</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Execution and Advanced</summary>
+                    <div class="sidebar-links">
+                        <a href="#strategies">Strategies</a>
+                        <a href="#advanced">Advanced and SMC</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Related Pages</summary>
+                    <div class="sidebar-links">
+                        <a href="strategy-authoring-handbook.html">Strategy authoring handbook</a>
+                        <a href="visual-authoring-handbook.html">Visual authoring handbook</a>
+                        <a href="function-cookbook.html">Function cookbook</a>
+                        <a href="examples-copybook.html">Open examples copybook</a>
+                        <a href="examples/index.html">Open examples hub</a>
+                    </div>
+                </details>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section class="hero" id="starters" data-search="starter manifest examples file list">
+                <div class="hero-copy">
+                    <p class="eyebrow">Source example inventory</p>
+                    <h2>ATK PyneScript Example Manifest</h2>
+                    <p class="lead">This page catalogs the example scripts under <code>source/example_user_scripts</code> and maps them to the API surfaces they demonstrate. Use it when you want to choose the best starting point for a new indicator, strategy, or visual bridge workflow.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="examples/source-example-user-scripts.zip" download>Download all examples</a>
+                        <a class="button" href="examples/index.html">Open examples hub</a>
+                        <a class="button" href="strategy-authoring-handbook.html">Strategy handbook</a>
+                        <a class="button" href="visual-authoring-handbook.html">Visual handbook</a>
+                        <a class="button" href="function-cookbook.html">Function cookbook</a>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="stat-grid">
+                        <article><span>Best indicator starter</span><strong>pynescript_indicator_starter.py</strong></article>
+                        <article><span>Best strategy starter</span><strong>pynescript_strategy_starter.py</strong></article>
+                        <article><span>Best attrs payload demo</span><strong>pynescript_visual_indicator_starter.py</strong></article>
+                        <article><span>Best ATK bridge demo</span><strong>pynescript_atk_shape_zone_bridge.py</strong></article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section" data-search="starter examples indicator strategy visual starter" id="starters-table">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Starter Examples</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Best first stop</strong>
+                        <span>If you are starting from zero, these are the safest examples to copy because they map directly to the current runtime contract.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Minimal but useful</strong>
+                        <span>This group covers the smallest viable indicator, strategy, and render-only object example before any advanced bridge or MTF logic.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Use copybook for code</strong>
+                        <span>Stay on this page to compare examples quickly. Jump to the copybook when you want the full runnable source instead of just the catalog view.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Best use</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_indicator_starter.py</code></td><td><code>indicator</code>, <code>input.int</code>, <code>input.source</code>, <code>ta.rsi</code>, <code>hline</code>.</td><td>First runnable indicator example.</td><td><a class="copy-link" href="examples/pynescript_indicator_starter.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_strategy_starter.py</code></td><td><code>strategy</code>, EMA crossover, mapped execution fields, <code>build_mapped_trade_frame</code>.</td><td>Canonical strategy starter.</td><td><a class="copy-link" href="examples/pynescript_strategy_starter.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_visual_indicator_starter.py</code></td><td><code>plot</code>, <code>plotshape</code>, <code>hline</code>, static <code>frame.attrs</code> payload for box, label, line objects.</td><td>Best introduction to render-only <code>build_visuals</code>.</td><td><a class="copy-link" href="examples/pynescript_visual_indicator_starter.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="runtime-surfaces" data-search="runtime surfaces inputs libraries intents barstate log plotbar plotchar table">
+                <div class="section-head">
+                    <p class="eyebrow">Foundations</p>
+                    <h2>Runtime Surface Examples Added for V6 Coverage</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Purpose</strong>
+                        <span>This group covers runtime surfaces that were supported in code but did not yet have dedicated teaching examples in the shipped copybook and manifest.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>How to use them</strong>
+                        <span>Pick these when you already understand the starter scripts and need a focused reference for one specific namespace or migration surface.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Teaching rule</strong>
+                        <span>Each file demonstrates one family clearly instead of combining every advanced API into one large example.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Best use</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_input_interactions_indicator.py</code></td><td>Extended input family, confirm metadata, and time/price input pairing.</td><td>Advanced input authoring.</td><td><a class="copy-link" href="examples/pynescript_input_interactions_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_barstate_log_indicator.py</code></td><td><code>barstate.from_index(...)</code> plus <code>log.info</code>/<code>log.warning</code>.</td><td>Runtime diagnostics and per-bar lifecycle flags.</td><td><a class="copy-link" href="examples/pynescript_barstate_log_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_plot_visual_surface_indicator.py</code></td><td><code>plotbar</code>, <code>plotchar</code>, <code>plotarrow</code>, <code>barcolor</code>, and <code>bgcolor</code>.</td><td>Plot-family migration reference.</td><td><a class="copy-link" href="examples/pynescript_plot_visual_surface_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_native_table_indicator.py</code></td><td>Native <code>table.new</code>, <code>table.cell</code>, and <code>ctx.table.new</code>.</td><td>Managed table widgets without the ATK bridge.</td><td><a class="copy-link" href="examples/pynescript_native_table_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_request_seed_runtime_indicator.py</code></td><td><code>request.seed(...)</code> with inline structured seeded data.</td><td>Seed-backed auxiliary data flows.</td><td><a class="copy-link" href="examples/pynescript_request_seed_runtime_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_map_runtime_indicator.py</code></td><td><code>map.new</code>, <code>map.put</code>, <code>map.get</code>, <code>map.keys</code>, and <code>map.size</code>.</td><td>Keyed runtime bundle reference.</td><td><a class="copy-link" href="examples/pynescript_map_runtime_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_matrix_runtime_indicator.py</code></td><td><code>matrix.new</code>, row/col reads, and simple 2D aggregation.</td><td>Matrix runtime reference.</td><td><a class="copy-link" href="examples/pynescript_matrix_runtime_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_library_enum_utils.py</code> and <code>pynescript_library_enum_import_indicator.py</code></td><td>Versioned library publishing, enum exports, and selective import binding.</td><td>Library authoring and reuse.</td><td><a class="copy-link" href="examples/pynescript_library_enum_import_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_strategy_intent_surface.py</code></td><td>Supported <code>strategy.entry/order/exit/close/cancel*</code> payload helpers alongside canonical mapped execution.</td><td>Intent-helper reference without teaching the wrong execution path.</td><td><a class="copy-link" href="examples/pynescript_strategy_intent_surface.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_alert_strategy.py</code> and <code>pynescript_strategy_alert_template_strategy.py</code></td><td>Alert calls, strategy template alerts, mapped tags, and alert-friendly trade metadata.</td><td>Alert authoring and payload design.</td><td><a class="copy-link" href="examples/pynescript_strategy_alert_template_strategy.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="subpanel" data-search="sub panel subpanel rsi macd histogram kdj stoch stochrsi volume">
+                <div class="section-head">
+                    <p class="eyebrow">Oscillators and lower panels</p>
+                    <h2>Sub-Panel Examples</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Use for non-overlay studies</strong>
+                        <span>These examples are for indicators that naturally live below price, such as RSI, MACD, stochastic families, or custom volume panels.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Good for visual layering</strong>
+                        <span>This group is the easiest place to study multi-line, histogram, and mixed renderer patterns without crowding the main price pane.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Keep calculations simple first</strong>
+                        <span>When building a new oscillator, start with one series, then add thresholds, histograms, or alternate candle rendering once the base frame is correct.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Pattern</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_rsi_indicator.py</code></td><td>RSI sub-panel with safe source fallback.</td><td>Pure frame builder.</td><td><a class="copy-link" href="examples/pynescript_rsi_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_histogram_sub_indicator.py</code></td><td>ATK histogram rendering in sub-panel.</td><td>Row-oriented visual data.</td><td><a class="copy-link" href="examples/pynescript_histogram_sub_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_macd_sub_indicator.py</code></td><td>MACD plus histogram colors.</td><td>Multi-visual sub-panel.</td><td><a class="copy-link" href="examples/pynescript_macd_sub_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_kdj.py</code></td><td>K, D, J oscillator with threshold lines.</td><td>Multi-line oscillator.</td><td><a class="copy-link" href="examples/pynescript_kdj.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_stoch.py</code></td><td>Stochastic oscillator.</td><td>Dual-line oscillator.</td><td><a class="copy-link" href="examples/pynescript_stoch.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_stochrsi.py</code></td><td>StochRSI with source handling.</td><td>Oscillator with source flexibility.</td><td><a class="copy-link" href="examples/pynescript_stochrsi.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_volume_with_ma.py</code></td><td>Volume histogram plus moving average in sub-panel.</td><td>Dual-render ATK bridge panel.</td><td><a class="copy-link" href="examples/pynescript_volume_with_ma.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_candlestick_subchart.py</code></td><td>Candles in a sub-panel.</td><td>ATK candlestick bridge.</td><td><a class="copy-link" href="examples/pynescript_candlestick_subchart.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="visuals" data-search="visuals shape text arrow table zones linefill fill bridge">
+                <div class="section-head">
+                    <p class="eyebrow">Visuals</p>
+                    <h2>Visual and ATK Bridge Examples</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>For visual-heavy scripts</strong>
+                        <span>Read this group when the script is primarily about shapes, text, fills, tables, zones, or object lifecycle rather than raw signal calculation.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Two payload styles dominate</strong>
+                        <span>Most examples here use either row-oriented <code>visual_*</code> columns or static <code>frame.attrs</code> bundles for object-like visuals.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Best bridge references live here</strong>
+                        <span>If you need ATK-native tables, shapes, line bundles, or chart.point-driven objects, this is the first section to scan.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Payload style</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_bbands_fill_indicator.py</code></td><td>Plots plus <code>linefill.new</code>.</td><td>Static plot declarations.</td><td><a class="copy-link" href="examples/pynescript_bbands_fill_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_atk_plot_fill_bridge.py</code></td><td><code>ctx.atk.plot_line</code> with <code>ctx.atk.fill_between</code>.</td><td>Context visuals.</td><td><a class="copy-link" href="examples/pynescript_atk_plot_fill_bridge.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_plot_shape_above.py</code></td><td>Conditional <code>plotshape</code> above bar.</td><td>Row-oriented.</td><td><a class="copy-link" href="examples/pynescript_plot_shape_above.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_plot_shape_below.py</code></td><td>Conditional <code>plotshape</code> below bar.</td><td>Row-oriented.</td><td><a class="copy-link" href="examples/pynescript_plot_shape_below.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_color_text.py</code></td><td>Styled text overlays with color, size, font, weight, position.</td><td><code>visual_*</code> columns.</td><td><a class="copy-link" href="examples/pynescript_color_text.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_color_line_text.py</code></td><td>Line-text bundles with ATK bridge.</td><td><code>visual_*</code> columns.</td><td><a class="copy-link" href="examples/pynescript_color_line_text.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_color_arrow.py</code></td><td>Directional arrows with per-row direction and color.</td><td><code>visual_*</code> columns.</td><td><a class="copy-link" href="examples/pynescript_color_arrow.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_atk_table_bridge.py</code></td><td>Dashboard table using <code>ctx.atk.table</code>.</td><td>Static <code>frame.attrs</code>.</td><td><a class="copy-link" href="examples/pynescript_atk_table_bridge.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_atk_shape_zone_bridge.py</code></td><td>Shape text, polyline, rectangles, rectangle ray.</td><td>Static <code>frame.attrs</code>.</td><td><a class="copy-link" href="examples/pynescript_atk_shape_zone_bridge.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_visual_settings_lifecycle_demo.py</code></td><td>Object creation and mutation lifecycle across line, box, and fill visuals.</td><td>Module-level declarations and lifecycle updates.</td><td><a class="copy-link" href="examples/pynescript_visual_settings_lifecycle_demo.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_chart_point_showcase.py</code></td><td><code>chart.point</code>, line, label, box, polyline APIs.</td><td>Object lifecycle.</td><td><a class="copy-link" href="examples/pynescript_chart_point_showcase.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="candles" data-search="candles candlestick profile volume profile fixed range rectangle profile candle">
+                <div class="section-head">
+                    <p class="eyebrow">Candles and distributions</p>
+                    <h2>Candles, Profile, and Volume Structure</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Structured price visuals</strong>
+                        <span>Use this group when the visual is based on full candle structure or horizontal distribution logic like value area and profile bars.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>More payload-heavy</strong>
+                        <span>These examples are usually less about single series and more about grouped visual payloads, making them a step up from plain plot declarations.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Best after basics</strong>
+                        <span>Do not start here unless you already understand the simpler indicator or bridge patterns, because these examples combine more moving parts.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Best use</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_candlestick.py</code></td><td>Simple <code>plotcandle</code> declaration.</td><td>Native candle declaration intro.</td><td><a class="copy-link" href="examples/pynescript_candlestick.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_color_candlestick.py</code></td><td>Color-per-bar candle rendering.</td><td>ATK bridge candle colors.</td><td><a class="copy-link" href="examples/pynescript_color_candlestick.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_atk_profile_candle_bridge.py</code></td><td>Composite visuals with candles and horizontal profile bars.</td><td>Complex bridge object bundle.</td><td><a class="copy-link" href="examples/pynescript_atk_profile_candle_bridge.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_volume_profile_fixed_range.py</code></td><td>Volume profile payload and value-area rendering.</td><td>Canonical volume profile example.</td><td><a class="copy-link" href="examples/pynescript_volume_profile_fixed_range.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_volume_profile_fixed_range_with_rectangle.py</code></td><td>Alternative profile flavor with rectangle integration.</td><td>Profile variant.</td><td><a class="copy-link" href="examples/pynescript_volume_profile_fixed_range_with_rectangle.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="mtf" data-search="mtf security request confirmation">
+                <div class="section-head">
+                    <p class="eyebrow">Multi-timeframe</p>
+                    <h2>MTF and Request Examples</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Use only when required</strong>
+                        <span>MTF logic is valuable but easy to overuse. Start here only when a script truly needs confirmation or data from another timeframe.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Signal builders only</strong>
+                        <span>All request and resampling logic should stay in the frame builder stage, not in trade mapping or render functions.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>One canonical example is enough</strong>
+                        <span>This section is intentionally small because the confirmation strategy already demonstrates the core MTF pattern correctly.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Best use</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_mtf_confirmation_strategy.py</code></td><td><code>request.security</code> with lambda expression and HTF trend confirmation.</td><td>Canonical MTF example.</td><td><a class="copy-link" href="examples/pynescript_mtf_confirmation_strategy.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="strategies" data-search="strategies bracket trailing stop rsi filter utbot">
+                <div class="section-head">
+                    <p class="eyebrow">Execution patterns</p>
+                    <h2>Strategy Examples</h2>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="strategy-authoring-handbook.html#order-type-matrix">Open order-type matrix</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#nautilus-order-flow">Open PyneScript to Nautilus flow</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#entry-fields">Open entry-fields handbook</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#risk-fields">Open bracket-risk handbook</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#trailing-fields">Open trailing handbook</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#reduce-tif-fields">Open reduce-only and TIF handbook</a>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Example</th><th>What it teaches</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_strategy_starter.py</code></td><td>Baseline <code>MARKET</code> mapped entry flow.</td><td><a href="examples/pynescript_strategy_starter.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_limit_entry_strategy.py</code></td><td><code>LIMIT</code> entries with <code>mapped_entry_limit_price</code>.</td><td><a href="examples/pynescript_limit_entry_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_stop_market_entry_strategy.py</code></td><td><code>STOP_MARKET</code> entries with <code>mapped_entry_trigger_price</code>.</td><td><a href="examples/pynescript_stop_market_entry_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_stop_limit_entry_strategy.py</code></td><td><code>STOP_LIMIT</code> entries with trigger and limit fields kept explicit.</td><td><a href="examples/pynescript_stop_limit_entry_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_reduce_only_exit_strategy.py</code></td><td><code>mapped_reduce_only</code> plus <code>IOC</code> exit-management intent.</td><td><a href="examples/pynescript_reduce_only_exit_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_strategy_alert_template_strategy.py</code></td><td><code>strategy_alert_message(...)</code> plus alert-friendly mapped tags.</td><td><a href="examples/pynescript_strategy_alert_template_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_slippage_strategy.py</code></td><td>Declaration-level <code>slippage</code> modeling.</td><td><a href="examples/pynescript_slippage_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_commission_strategy.py</code></td><td>Fee modeling with <code>commission_type</code> and <code>commission_value</code>.</td><td><a href="examples/pynescript_commission_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_margin_strategy.py</code></td><td>Margin and percent-of-equity sizing assumptions.</td><td><a href="examples/pynescript_margin_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_pyramiding_strategy.py</code></td><td><code>pyramiding</code> add-on entry flow.</td><td><a href="examples/pynescript_pyramiding_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_limit_fill_assumption_strategy.py</code></td><td><code>backtest_fill_limits_assumption</code> with explicit limit-entry design.</td><td><a href="examples/pynescript_limit_fill_assumption_strategy.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Read after starter strategy</strong>
+                        <span>These patterns assume you already understand mapped execution fields and the separation between signal building and trade mapping.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Each file adds one idea</strong>
+                        <span>Bracket exits, trailing stops, RSI filters, and shared-core reuse are all easier to learn as separate variations rather than one giant template.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Stay strict on stage ownership</strong>
+                        <span>Use these examples to study strategy patterns, but keep all TA and decision logic in <code>build_signal_frame</code> when adapting them.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Best use</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_sma_crossover_strategy.py</code></td><td>SMA crossover mapped strategy.</td><td>Simple crossover template.</td><td><a class="copy-link" href="examples/pynescript_sma_crossover_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_bracket_strategy.py</code></td><td>Bracket exits with <code>mapped_sl</code> and <code>mapped_tp</code>.</td><td>Risk-managed entries.</td><td><a class="copy-link" href="examples/pynescript_bracket_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_trailing_stop_strategy.py</code></td><td>Trailing stop with <code>mapped_trail_offset</code>.</td><td>Trailing exit pattern.</td><td><a class="copy-link" href="examples/pynescript_trailing_stop_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_rsi_filter_strategy.py</code></td><td>RSI gating around a crossover entry system.</td><td>Multi-signal filter pattern.</td><td><a class="copy-link" href="examples/pynescript_rsi_filter_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_utbot_strategy.py</code></td><td>UTBOT strategy using shared core helpers.</td><td>Core reuse pattern.</td><td><a class="copy-link" href="examples/pynescript_utbot_strategy.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_utbot_strategy_full.py</code></td><td>UTBOT strategy with explicit trade quantity input.</td><td>Parameterized strategy template.</td><td><a class="copy-link" href="examples/pynescript_utbot_strategy_full.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section" id="advanced" data-search="advanced smc ict murrey math utbot supertrend">
+                <div class="section-head">
+                    <p class="eyebrow">Advanced examples</p>
+                    <h2>Market Structure, Signal Frameworks, and Advanced Overlays</h2>
+                </div>
+                <div class="summary-strip">
+                    <article class="summary-pill">
+                        <strong>Not the place to start</strong>
+                        <span>These files combine more concepts, more state, and more visuals. They are reference material once the lower-complexity examples already make sense.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Best for architecture study</strong>
+                        <span>Use this group to see how larger PyneScript scripts organize confluence logic, advanced overlays, and richer presentation layers.</span>
+                    </article>
+                    <article class="summary-pill">
+                        <strong>Extract patterns, not whole scripts</strong>
+                        <span>In most cases you should borrow one technique from these examples at a time instead of cloning the full file and editing everything at once.</span>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>File</th><th>What it demonstrates</th><th>Notes</th><th>Download</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>pynescript_utbot.py</code></td><td>UTBOT indicator and ATK arrow rendering.</td><td>Good signal-annotation example.</td><td><a class="copy-link" href="examples/pynescript_utbot.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_smc.py</code></td><td>Advanced SMC framework using smart-money concepts.</td><td>Complex multi-component calculation.</td><td><a class="copy-link" href="examples/pynescript_smc.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_smc_ict.py</code></td><td>ICT-style confluence with summary table.</td><td>Excellent advanced table overlay example.</td><td><a class="copy-link" href="examples/pynescript_smc_ict.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_supertrend_indicator.py</code></td><td>Basic supertrend line overlay.</td><td>Overlay trend starter.</td><td><a class="copy-link" href="examples/pynescript_supertrend_indicator.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_supertrend_color_line.py</code></td><td>Supertrend with per-segment ATK color line rendering.</td><td>ATK color-line pattern.</td><td><a class="copy-link" href="examples/pynescript_supertrend_color_line.py" download>Download</a></td></tr>
+                            <tr><td><code>pynescript_murrey_math_lines_v2.py</code></td><td>Murrey math overlay logic.</td><td>Advanced fixed-level overlay.</td><td><a class="copy-link" href="examples/pynescript_murrey_math_lines_v2.py" download>Download</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <aside class="toc">
+            <p class="eyebrow">On this page</p>
+            <nav id="toc-nav"></nav>
+        </aside>
+    </div>
+
+    <script src="assets/app.js"></script>
+</body>
+</html>

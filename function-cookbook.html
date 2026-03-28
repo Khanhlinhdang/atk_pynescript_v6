@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATK PyneScript V6 Function Cookbook</title>
+    <meta name="description" content="Function-by-function cookbook for ATK PyneScript V6 covering inputs, request security, strategy mapping, build_visuals, chart.point, and object APIs with detailed examples.">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">ATK</div>
+                <div>
+                    <p class="eyebrow">PyneScript V6</p>
+                    <h1>Function Cookbook</h1>
+                </div>
+            </div>
+            <label class="search-box" for="doc-search">
+                <span>Search cookbook</span>
+                <input id="doc-search" type="search" placeholder="input.int, request.security, chart.point...">
+            </label>
+            <div class="current-section-indicator" aria-live="polite">
+                <span class="current-section-label">Current section</span>
+                <strong class="current-section-value">Function Cookbook</strong>
+            </div>
+            <nav class="nav" aria-label="Function cookbook">
+                <a href="index.html">Back to main docs</a>
+                <a href="examples-copybook.html">Open examples copybook</a>
+                <a href="examples-manifest.html">Open examples manifest</a>
+                <a href="visual-authoring-handbook.html">Open visual handbook</a>
+                <a href="examples/index.html">Open examples hub</a>
+                <details class="nav-group" open>
+                    <summary>Core Functions</summary>
+                    <div class="sidebar-links">
+                        <a href="#input-recipes">input.*</a>
+                        <a href="#library-recipes">library imports</a>
+                        <a href="#request-recipes">request.*</a>
+                        <a href="#barstate-log-recipes">barstate and log</a>
+                        <a href="#array-aggregate-recipes">array aggregates</a>
+                        <a href="#map-recipes">map.*</a>
+                        <a href="#matrix-recipes">matrix.*</a>
+                        <a href="#strategy-intent-recipes">strategy intents</a>
+                        <a href="#trade-frame-recipes">trade-frame fields</a>
+                        <a href="#strategy-declaration-recipes">strategy(...) params</a>
+                    </div>
+                </details>
+                <details class="nav-group">
+                    <summary>Visual Functions</summary>
+                    <div class="sidebar-links">
+                        <a href="#plot-family-recipes">plot, fill, linefill, plotshape</a>
+                        <a href="#table-recipes">table.*</a>
+                        <a href="#visual-decision-tree">Visual decision tree</a>
+                        <a href="#build-visuals-wrong-right">build_visuals wrong vs right</a>
+                        <a href="#chart-point-recipes">chart.point</a>
+                        <a href="#object-recipes">line, label, box</a>
+                        <a href="#bridge-recipes">ctx.atk.*</a>
+                    </div>
+                </details>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <header class="hero" data-search="function cookbook detailed api examples">
+                <div class="hero-copy">
+                    <p class="eyebrow">Lookup by function, not by page cluster</p>
+                    <h2>Function Cookbook for Real Script Authoring</h2>
+                    <p class="lead">This page is for the moment when you already know which API you want, but still need exact parameter meaning, a safe usage pattern, and a complete snippet you can adapt without breaking the stage contract.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#input-recipes">Start with inputs</a>
+                        <a class="button" href="#request-recipes">Jump to request.security</a>
+                        <a class="button" href="#trade-frame-recipes">Jump to trade-frame fields</a>
+                        <a class="button" href="#chart-point-recipes">Jump to chart.point</a>
+                        <a class="button" href="visual-authoring-handbook.html">Open visual handbook</a>
+                        <a class="button" href="examples/source-example-user-scripts.zip" download>Download all examples</a>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="stat-grid">
+                        <article><span>Best for</span><strong>Parameter-level lookup</strong></article>
+                        <article><span>Focus</span><strong>How to choose args safely</strong></article>
+                        <article><span>Style</span><strong>Annotated, stage-correct snippets</strong></article>
+                        <article><span>Companion</span><strong>Use with raw example downloads</strong></article>
+                    </div>
+                </div>
+            </header>
+
+            <section class="doc-section" id="input-recipes" data-search="input int float string text_area time price source symbol session timeframe color enum recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>input.* Recipes</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Function</th><th>Use it when</th><th>Main parameters</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>input.int</code></td><td>The setting is a discrete count or lookback.</td><td><code>defval</code>, <code>title</code>, <code>key</code>, <code>minval</code>, <code>maxval</code>, <code>step</code></td></tr>
+                            <tr><td><code>input.float</code></td><td>The setting is continuous such as a multiplier or threshold.</td><td><code>defval</code>, <code>minval</code>, <code>maxval</code>, <code>step</code></td></tr>
+                            <tr><td><code>input.string</code></td><td>The value is free text or a lightweight identifier.</td><td><code>defval</code>, <code>title</code>, <code>key</code>, optional <code>options</code></td></tr>
+                            <tr><td><code>input.text_area</code></td><td>The user needs multi-line notes or a longer editable payload.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.time</code></td><td>The script needs a timestamp or an interactive chart-picked time anchor.</td><td><code>defval</code>, <code>title</code>, <code>key</code>, optional <code>confirm</code></td></tr>
+                            <tr><td><code>input.price</code></td><td>The script needs an editable or chart-picked price anchor.</td><td><code>defval</code>, <code>title</code>, <code>key</code>, optional <code>confirm</code></td></tr>
+                            <tr><td><code>input.source</code></td><td>The user picks a market source like close or hl2.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.symbol</code></td><td>The user chooses a tradable symbol or external market identifier.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.session</code></td><td>The script needs a session-style text window such as <code>0930-1600</code>.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.timeframe</code></td><td>The script truly does MTF work.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.color</code></td><td>The user edits an input-owned color or runtime styling value.</td><td><code>defval</code>, <code>title</code>, <code>key</code></td></tr>
+                            <tr><td><code>input.enum</code></td><td>The choice must stay inside a known set.</td><td><code>defval</code>, <code>title</code>, <code>key</code>, <code>options</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Choosing the right input family">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import input
+
+
+# Discrete bar count.
+length = input.int(20, title="Length", key="length", minval=1)
+
+# Continuous multiplier.
+multiplier = input.float(2.0, title="StdDev Mult", key="multiplier", minval=0.1, step=0.1)
+
+# Free text for lightweight labels.
+label_text = input.string("baseline", title="Label", key="label_text")
+
+# Multi-line notes.
+notes = input.text_area("alpha\nbeta", title="Notes", key="notes")
+
+# Interactive chart-pick pair.
+trigger_time = input.time(1700000000, title="Trigger Time", key="trigger_time", confirm=True)
+trigger_price = input.price(101.25, title="Trigger Price", key="trigger_price", confirm=True)
+
+# Market source selector.
+source_type = input.source("close", title="Source", key="source_type")
+
+# Symbol and session selectors.
+ticker = input.symbol("BINANCE:BTCUSDT", title="Ticker", key="ticker")
+session_value = input.session("0930-1600", title="Session", key="session_value")
+
+# Only add timeframe when you really call request.security later.
+confirm_tf = input.timeframe("15m", title="Confirm TF", key="confirm_tf")
+
+# Input-owned color value.
+line_color = input.color("#2962ff", title="Line Color", key="line_color")
+
+# Bounded named choice.
+ma_mode = input.enum("ema", title="MA Mode", key="ma_mode", options=["sma", "ema", "rma"])</code></pre>
+                </div>
+                <div class="callout">
+                    <strong>Rule of thumb:</strong> if free text would let the user enter invalid values, do not use <code>input.string</code>. Use <code>input.enum</code> or a more specific input family instead.
+                </div>
+                <div class="callout">
+                    <strong>Interactive inputs:</strong> ATK now preserves <code>confirm</code>, time/price pairings, and picked-value metadata for <code>input.time</code> and <code>input.price</code>. Use those fields when the user should anchor a chart event explicitly rather than typing a generic number.
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_input_interactions_indicator.py" download>Download advanced input example</a>
+                    <a class="copy-link" href="examples-copybook.html#input-interactions">Open annotated input example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="library-recipes" data-search="library import selective import enum exports quoted import recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>library(...), import_library(...), and Enum Export Recipes</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Surface</th><th>Use it when</th><th>Important note</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>library(...)</code></td><td>You are publishing reusable helpers for other scripts.</td><td>Do not treat a library as a chart-facing script. It should export helpers, not builders.</td></tr>
+                            <tr><td><code>import_library("Lib@1")</code></td><td>You want the whole published namespace.</td><td>Version stays explicit in the spec string.</td></tr>
+                            <tr><td><code>import_library("Lib@1::Mode,plus_one as utils")</code></td><td>You want only selected exports or enum types.</td><td>This is the best raw-Python teaching pattern for selective imports.</td></tr>
+                            <tr><td><code>import "Lib@1::Mode"</code></td><td>You are authoring directly in the editor and want quoted-import sugar.</td><td>The editor preprocesses it into valid Python before execution. Do not paste that syntax into plain import-tested <code>.py</code> files.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Selective enum import pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from enum import Enum
+
+from source import import_library, library
+
+
+library("Pyne Enum Utils", overlay=False, version=1)
+
+
+class TrendMode(Enum):
+    FAST = "fast"
+    SLOW = "slow"
+
+
+def resolve_length(mode):
+    mapping = {"fast": 8, "slow": 21}
+    return mapping.get(str(getattr(mode, "value", mode) or "slow"), 21)
+
+
+# In another script
+utils = import_library("Pyne Enum Utils@1::TrendMode,resolve_length as utils")
+length = utils.resolve_length(utils.TrendMode.FAST)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_library_enum_utils.py" download>Download enum library example</a>
+                    <a class="copy-link" href="examples/pynescript_library_enum_import_indicator.py" download>Download selective import example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="request-recipes" data-search="request security lower tf seed recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>request.* Recipes</h2>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="card">
+                        <h3><code>frame</code></h3>
+                        <p>Pass the base dataframe you are currently computing from, usually the working copy inside <code>build_indicator_frame</code> or <code>build_signal_frame</code>.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>timeframe</code></h3>
+                        <p>Use strings like <code>15m</code>, <code>1h</code>, or <code>1d</code>. Keep them user-configurable only if the script meaning actually changes by timeframe.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>expr</code></h3>
+                        <p>Usually a lambda that receives the resampled frame. Keep it focused on one HTF calculation, not a giant nested workflow.</p>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Parameter</th><th>What it controls</th><th>How to choose it</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>frame</code></td><td>The base dataset to resample from.</td><td>Use the clean frame already being computed in the current builder. Do not pass a partially mapped trade frame or a render-stage slice.</td></tr>
+                            <tr><td><code>timeframe</code></td><td>The target aggregation level.</td><td>Choose only the timeframe that actually changes the script meaning. If the user cannot explain why HTF context matters, the script probably does not need <code>request.security</code>.</td></tr>
+                            <tr><td><code>expr</code></td><td>The HTF computation to run on the resampled frame.</td><td>Keep it narrow and single-purpose. A small lambda for one HTF EMA is easier to reason about than a deeply nested pipeline.</td></tr>
+                            <tr><td><code>fill_method</code></td><td>How the HTF result is aligned back to the base frame.</td><td>Use forward-fill when the last confirmed HTF value should remain active until the next HTF bar arrives. Use backward-fill only when the semantic meaning really demands it.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="request.security in a stage-correct strategy">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>import pandas as pd
+
+from source import input, request, strategy, ta
+
+
+strategy("Annotated MTF Strategy", overlay=True, process_orders_on_close=True, max_bars_back=240)
+confirm_tf = input.timeframe("15m", title="Confirm TF", key="confirm_tf")
+trend_length = input.int(34, title="HTF Trend EMA", key="trend_length", minval=1)
+
+
+def build_signal_frame(df: pd.DataFrame, params: dict | None = None) -&gt; pd.DataFrame:
+    frame = df.copy().reset_index(drop=True)
+    merged = {
+        "confirm_tf": str(confirm_tf),
+        "trend_length": int(trend_length),
+    } | dict(params or {})
+
+    # request.security belongs in the signal builder because it is part of computation.
+    htf_trend = request.security(
+        frame,
+        str(merged.get("confirm_tf", "15m") or "15m"),
+        lambda x: ta.ema(x["close"], int(merged.get("trend_length", 34) or 34)),
+    )
+
+    frame["htf_trend"] = htf_trend
+    frame["trend_ok"] = (frame["close"] &gt;= htf_trend.fillna(frame["close"]))
+    return frame</code></pre>
+                </div>
+                <div class="code-block" data-title="request.seed with inline structured data">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import indicator, input, request
+
+
+indicator("Annotated Request Seed", overlay=False)
+seed_window = input.int(4, title="Seed Window", key="seed_window", minval=2)
+
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    window = max(int((params or {}).get("seed_window", seed_window) or seed_window), 2)
+
+    seeded_source = {
+        "seeded_close": frame["close"].rolling(window, min_periods=1).mean().round(4).tolist(),
+        "seeded_bias": ["bullish" if close_value >= open_value else "bearish" for open_value, close_value in zip(frame["open"], frame["close"])],
+    }
+
+    frame["seeded_close"] = request.seed(seeded_source, "seeded_close")
+    frame["seeded_bias"] = request.seed(seeded_source, "seeded_bias")
+    return frame</code></pre>
+                </div>
+                <div class="section-head" id="request-wrong-right">
+                    <p class="eyebrow">Wrong vs right</p>
+                    <h2>request.security(...) by Contract</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card danger">
+                        <h3>Wrong</h3>
+                        <p>Calling <code>request.security</code> inside <code>build_trade_frame</code> or <code>build_visuals</code>. That turns a compute helper into a mapping-stage or render-stage dependency.</p>
+                    </article>
+                    <article class="card success">
+                        <h3>Right</h3>
+                        <p>Compute the resampled series inside <code>build_indicator_frame</code> or <code>build_signal_frame</code>, write the output into a column, and let later stages only consume the prepared result.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="request.security wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: trade mapping should not contain computation.
+def build_trade_frame(signal_df, params=None, styles=None):
+    signal_df = signal_df.copy()
+    signal_df["htf"] = request.security(signal_df, "1h", lambda x: ta.ema(x["close"], 34))
+    return build_mapped_trade_frame(signal_df)
+
+
+# Right: compute in the signal builder, then map only.
+def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["htf"] = request.security(frame, "1h", lambda x: ta.ema(x["close"], 34))
+    frame["buy_signal"] = (frame["close"] &gt;= frame["htf"].fillna(frame["close"]))
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples-copybook.html#mtf-strategy">Open annotated MTF strategy</a>
+                    <a class="copy-link" href="examples/pynescript_request_seed_runtime_indicator.py" download>Download request.seed example</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#mtf-patterns">Open strategy MTF handbook section</a>
+                    <a class="copy-link" href="visual-authoring-handbook.html#stage-contracts">Open stage contract handbook</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="barstate-log-recipes" data-search="barstate log recipes realtime confirmed last bar diagnostics">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>barstate and log.* Recipes</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3><code>barstate.from_index(...)</code></h3>
+                        <p>Use it when you need deterministic first-bar, last-bar, confirmed, or realtime flags during a batch frame build. It is the safe way to derive lifecycle markers from the current slice length.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>log.info/warning/error</code></h3>
+                        <p>Use logging for diagnostics, capability probes, and author-facing feedback. Keep it informative and lightweight rather than treating it as a substitute for computed output columns.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="barstate and log pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>for index in range(len(frame)):
+    state = barstate.from_index(index, len(frame), is_realtime=index == len(frame) - 1)
+    first_flags.append(state.isfirst)
+    last_flags.append(state.islast)
+
+log.info("prepared {} bars", len(frame))
+if last_flags and last_flags[-1]:
+    log.warning("last bar reached in demo flow")</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_barstate_log_indicator.py" download>Download barstate and log example</a>
+                    <a class="copy-link" href="examples-copybook.html#barstate-log">Open annotated example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="array-aggregate-recipes" data-search="array first last sum avg min max sort reverse fill aggregate recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>array.* Aggregate Method Recipes</h2>
+                </div>
+                <p class="section-text">Beyond the core mutation helpers (<code>push</code>, <code>pop</code>, <code>get</code>, <code>set</code>, <code>size</code>, etc.), the array namespace includes aggregate and reorder methods that are useful when you need to summarize or reshape a stored list without dropping back to plain Python.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Method</th><th>Returns</th><th>Use it when</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>array.first(handle)</code></td><td>First element, or <code>None</code></td><td>You want the oldest element without popping it.</td></tr>
+                            <tr><td><code>array.last(handle)</code></td><td>Last element, or <code>None</code></td><td>You want the most-recent element without a full slice.</td></tr>
+                            <tr><td><code>array.sum(handle)</code></td><td><code>float</code></td><td>Rolling sum of a numeric buffer.</td></tr>
+                            <tr><td><code>array.avg(handle)</code></td><td><code>float</code></td><td>Average of a numeric buffer; NaN values are excluded.</td></tr>
+                            <tr><td><code>array.min(handle)</code></td><td><code>float</code></td><td>Minimum over all elements; NaN-safe.</td></tr>
+                            <tr><td><code>array.max(handle)</code></td><td><code>float</code></td><td>Maximum over all elements; NaN-safe.</td></tr>
+                            <tr><td><code>array.sort(handle, order="asc")</code></td><td><code>None</code> (in-place)</td><td>Sort the buffer before reading a ranked value.</td></tr>
+                            <tr><td><code>array.reverse(handle)</code></td><td><code>None</code> (in-place)</td><td>Reverse the current order.</td></tr>
+                            <tr><td><code>array.fill(handle, value, index_from=0, index_to=None)</code></td><td><code>None</code> (in-place)</td><td>Reset a range of elements to a constant without rebuilding the array.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Rolling buffer with aggregate reads">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import array, indicator, ta
+
+indicator("Rolling Buffer Demo", overlay=False)
+
+buf = array.new_float(0)
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    for val in frame["close"].tolist():
+        array.push(buf, float(val))
+        if array.size(buf) > 20:
+            array.shift(buf)   # keep last 20 values
+
+    frame["buf_avg"] = array.avg(buf)
+    frame["buf_min"] = array.min(buf)
+    frame["buf_max"] = array.max(buf)
+    frame["buf_sum"] = array.sum(buf)
+    frame["buf_first"] = array.first(buf)
+    frame["buf_last"] = array.last(buf)
+    return frame</code></pre>
+                </div>
+                <div class="code-block" data-title="Sort and reverse patterns">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Sort ascending then read the median element.
+scores = array.from_([5.0, 1.0, 3.0, 4.0, 2.0])
+array.sort(scores, order="asc")
+median_value = array.get(scores, array.size(scores) // 2)
+
+# Fill a buffer with zeros to reset it.
+data = array.new_float(10, 0.0)
+array.fill(data, 0.0)</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_barstate_log_indicator.py" download>Download array usage in barstate example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="map-recipes" data-search="map namespace new put get keys size contains remove clear copy to_array_keys to_array_values recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>map.* Namespace Recipes</h2>
+                </div>
+                <p class="section-text">The <code>map</code> namespace provides a string-keyed dictionary container with a stable Pine-style API. Use it when you need to store script-scoped key-value metadata alongside a frame, pass named parameters between helpers, or record per-run configuration in <code>frame.attrs</code>.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Method</th><th>Returns</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>map.new()</code></td><td>map handle <code>{}</code></td><td>Create an empty map. Usually assigned to a module-level variable.</td></tr>
+                            <tr><td><code>map.put(handle, key, value)</code></td><td><code>None</code></td><td>Insert or overwrite a key.</td></tr>
+                            <tr><td><code>map.get(handle, key, default=None)</code></td><td>stored value or <code>default</code></td><td>Safe read; returns <code>default</code> when the key is absent.</td></tr>
+                            <tr><td><code>map.keys(handle)</code></td><td><code>list[str]</code></td><td>All current keys. Useful for iteration or introspection.</td></tr>
+                            <tr><td><code>map.values(handle)</code></td><td><code>list</code></td><td>All current values in insertion order.</td></tr>
+                            <tr><td><code>map.size(handle)</code></td><td><code>int</code></td><td>Number of entries.</td></tr>
+                            <tr><td><code>map.contains(handle, key)</code></td><td><code>bool</code></td><td>Check whether a key exists before calling <code>get</code>.</td></tr>
+                            <tr><td><code>map.remove(handle, key)</code></td><td><code>None</code></td><td>Remove a key if present.</td></tr>
+                            <tr><td><code>map.clear(handle)</code></td><td><code>None</code></td><td>Delete all entries.</td></tr>
+                            <tr><td><code>map.copy(handle)</code></td><td>new map handle</td><td>Shallow copy. Good for snapshotting before mutation.</td></tr>
+                            <tr><td><code>map.to_array_keys(handle)</code></td><td><code>list[str]</code></td><td>Independent copy of all keys as a plain list.</td></tr>
+                            <tr><td><code>map.to_array_values(handle)</code></td><td><code>list</code></td><td>Independent copy of all values as a plain list.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="map.* in a frame builder">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import indicator, input, map, ta
+
+indicator("Map Runtime Demo", overlay=False)
+fast_length = input.int(8, title="Fast", key="fast_length")
+slow_length = input.int(21, title="Slow", key="slow_length")
+
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    merged = {"fast_length": int(fast_length), "slow_length": int(slow_length)} | dict(params or {})
+
+    fast = max(int(merged.get("fast_length", 8) or 8), 1)
+    slow = max(int(merged.get("slow_length", 21) or 21), 1)
+
+    frame["ema_fast"] = ta.ema(frame["close"], fast)
+    frame["ema_slow"] = ta.ema(frame["close"], slow)
+    frame["spread_value"] = (frame["ema_fast"] - frame["ema_slow"]).fillna(0.0)
+
+    # Build a named config map and expose it via attrs.
+    cfg = map.new()
+    map.put(cfg, "fast_length", fast)
+    map.put(cfg, "slow_length", slow)
+    trend = "bullish" if float(frame["spread_value"].iloc[-1] or 0.0) >= 0.0 else "bearish"
+    map.put(cfg, "trend_bias", trend)
+
+    frame.attrs["map_keys"] = map.keys(cfg)
+    frame.attrs["map_size"] = map.size(cfg)
+    frame.attrs["trend_bias"] = map.get(cfg, "trend_bias", "neutral")
+    return frame</code></pre>
+                </div>
+                <div class="callout">
+                    <strong>When to use map vs dict:</strong> use <code>map.*</code> when authoring in the PyneScript style and the map will be passed to other PyneScript helpers. Use plain Python <code>dict</code> when the data stays internal to a single function and never crosses the Pine-style API boundary.
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_map_runtime_indicator.py" download>Download map runtime example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="matrix-recipes" data-search="matrix namespace new set get row col rows columns add_row add_col submatrix sum avg min max copy recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>matrix.* Namespace Recipes</h2>
+                </div>
+                <p class="section-text">The <code>matrix</code> namespace models a 2-D numeric grid. Use it when you need to store a window of multi-column bar data, compute a rolling covariance surface, or pass structured numeric payloads between stages without building custom dataframe logic.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Method</th><th>Returns</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>matrix.new(rows, cols, fill=0.0)</code></td><td>matrix handle</td><td>Create a rows×cols grid pre-filled with <code>fill</code>.</td></tr>
+                            <tr><td><code>matrix.set(handle, row, col, value)</code></td><td><code>None</code></td><td>Write a single cell.</td></tr>
+                            <tr><td><code>matrix.get(handle, row, col)</code></td><td><code>float</code></td><td>Read a single cell.</td></tr>
+                            <tr><td><code>matrix.rows(handle)</code></td><td><code>int</code></td><td>Current row count.</td></tr>
+                            <tr><td><code>matrix.columns(handle)</code></td><td><code>int</code></td><td>Current column count.</td></tr>
+                            <tr><td><code>matrix.row(handle, row_index)</code></td><td><code>list[float]</code></td><td>All values in a specific row.</td></tr>
+                            <tr><td><code>matrix.col(handle, col_index)</code></td><td><code>list[float]</code></td><td>All values in a specific column.</td></tr>
+                            <tr><td><code>matrix.add_row(handle, row_index, values)</code></td><td><code>None</code></td><td>Insert a new row at a position.</td></tr>
+                            <tr><td><code>matrix.add_col(handle, values)</code></td><td><code>None</code></td><td>Append a new column.</td></tr>
+                            <tr><td><code>matrix.remove_row(handle, row_index)</code></td><td><code>None</code></td><td>Delete a row.</td></tr>
+                            <tr><td><code>matrix.submatrix(handle, from_row, to_row, from_col, to_col)</code></td><td>new matrix handle</td><td>Extract a rectangular slice into a new matrix.</td></tr>
+                            <tr><td><code>matrix.sum(handle)</code></td><td><code>float</code></td><td>Sum of all non-NaN elements.</td></tr>
+                            <tr><td><code>matrix.avg(handle)</code></td><td><code>float</code></td><td>Average of all non-NaN elements.</td></tr>
+                            <tr><td><code>matrix.min(handle)</code></td><td><code>float</code></td><td>Minimum element (NaN-safe).</td></tr>
+                            <tr><td><code>matrix.max(handle)</code></td><td><code>float</code></td><td>Maximum element (NaN-safe).</td></tr>
+                            <tr><td><code>matrix.copy(handle)</code></td><td>new matrix handle</td><td>Deep copy. Safe to mutate independently.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="matrix.* OHLC window example">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import indicator, input, matrix
+
+indicator("Matrix Runtime Demo", overlay=False)
+window = input.int(3, title="Window", key="window", minval=1)
+
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    merged = {"window": int(window)} | dict(params or {})
+    win = max(int(merged.get("window", 3) or 3), 1)
+
+    tail = frame.tail(win).reset_index(drop=True)
+    grid = matrix.new(len(tail), 2, 0.0)
+
+    for i, row in tail.iterrows():
+        matrix.set(grid, i, 0, float(row["open"]))
+        matrix.set(grid, i, 1, float(row["close"]))
+
+    # Append a computed column: high-low range.
+    matrix.add_col(grid, values=(tail["high"] - tail["low"]).astype(float).tolist())
+
+    frame["open_sum"] = float(sum(matrix.col(grid, 0))) if matrix.rows(grid) > 0 else 0.0
+    frame["close_sum"] = float(sum(matrix.col(grid, 1))) if matrix.rows(grid) > 0 else 0.0
+    frame["range_sum"] = float(sum(matrix.col(grid, 2))) if matrix.rows(grid) > 0 else 0.0
+    frame["grid_total_sum"] = matrix.sum(grid)
+    frame["grid_avg"] = matrix.avg(grid)
+
+    frame.attrs["matrix_shape"] = {"rows": matrix.rows(grid), "columns": matrix.columns(grid)}
+    frame.attrs["last_row"] = matrix.row(grid, matrix.rows(grid) - 1) if matrix.rows(grid) > 0 else []
+    return frame</code></pre>
+                </div>
+                <div class="code-block" data-title="submatrix extraction">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Extract top-left 2×2 sub-grid from a 4×4 matrix.
+full = matrix.new(4, 4, 1.0)
+sub = matrix.submatrix(full, from_row=0, to_row=2, from_col=0, to_col=2)
+print(matrix.rows(sub), matrix.columns(sub))  # 2, 2</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_matrix_runtime_indicator.py" download>Download matrix runtime example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="strategy-intent-recipes" data-search="strategy entry exit close cancel recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>strategy.entry, exit, close, cancel Recipes</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Helper</th><th>Use it for</th><th>Important parameters</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>strategy.entry(entry_id, side, **kwargs)</code></td><td>A named entry intent.</td><td><code>entry_id</code>, <code>side</code>, <code>when</code>, <code>limit</code>, <code>stop</code></td></tr>
+                            <tr><td><code>strategy.exit(exit_id, from_entry="", when=True, **kwargs)</code></td><td>A named exit attached to an entry.</td><td><code>exit_id</code>, <code>from_entry</code>, <code>when</code>, <code>stop</code>, <code>limit</code></td></tr>
+                            <tr><td><code>strategy.close(entry_id, when=True, **kwargs)</code></td><td>Flatten one specific entry.</td><td><code>entry_id</code>, <code>when</code></td></tr>
+                            <tr><td><code>strategy.cancel(order_id, when=True, **kwargs)</code></td><td>Cancel a pending order intent.</td><td><code>order_id</code>, <code>when</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Intent helpers as explicit payload builders">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import strategy
+
+
+# Entry on a bullish condition.
+long_entry = strategy.entry("L", "BUY", when=True, limit=100.5)
+
+# Exit only for that entry family.
+protective_exit = strategy.exit("LX", from_entry="L", when=True, stop=98.0, limit=105.0)
+
+# Close one family, not the whole book.
+close_long = strategy.close("L", when=False)
+
+# Cancel a pending order when the setup is invalidated.
+cancel_long = strategy.cancel("L", when=False)</code></pre>
+                </div>
+                <div class="callout">
+                    <strong>Canonical-path note:</strong> these helpers are supported and useful, but the current ATK strategy runtime still expects your real execution intent to be expressed through canonical trade-frame fields inside <code>build_signal_frame(...)</code>. Treat helper payloads as explicit templates, diagnostics aids, or publish-surface documentation.
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_strategy_intent_surface.py" download>Download strategy intent example</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#intent-helper-surface">Open handbook note</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="trade-frame-recipes" data-search="entry_side entry_price quantity sl tp build_mapped_trade_frame recipes trade frame">
+                <div class="section-head">
+                    <p class="eyebrow">Core functions</p>
+                    <h2>Canonical Trade-Frame Field Recipes</h2>
+                </div>
+                <div class="callout">
+                    <strong>Rule:</strong> canonical trade-frame execution fields belong to <code>build_signal_frame</code>. <code>build_trade_frame</code> should normalize or delegate to <code>build_mapped_trade_frame(...)</code>, not invent entry, risk, or sizing intent after the fact.
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Field</th><th>Meaning</th><th>How to choose it</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>entry_side</code></td><td>Entry direction for the row.</td><td>Emit <code>BUY</code> or <code>SELL</code> only on rows that truly want an entry. Use an empty string elsewhere.</td></tr>
+                            <tr><td><code>entry_order_type</code></td><td>Entry order primitive.</td><td>Use <code>MARKET</code>, <code>LIMIT</code>, <code>STOP_MARKET</code>, or <code>STOP_LIMIT</code> for the stable PyneScript signal-frame subset.</td></tr>
+                            <tr><td><code>entry_price</code></td><td>Price basis for entry.</td><td>Use <code>open</code>, <code>close</code>, or a computed trigger series that matches how the strategy intends to enter.</td></tr>
+                            <tr><td><code>entry_limit_price</code></td><td>Limit price for passive entries.</td><td>Populate it for <code>LIMIT</code> or <code>STOP_LIMIT</code>. Keep it consistent with the intended resting price, not just duplicated blindly from <code>entry_price</code>.</td></tr>
+                            <tr><td><code>entry_trigger_price</code></td><td>Trigger price for stop-style entries.</td><td>Populate it for <code>STOP_MARKET</code> or <code>STOP_LIMIT</code>. This is the activation threshold, not the passive limit price.</td></tr>
+                            <tr><td><code>quantity</code></td><td>Absolute size.</td><td>Use it when the strategy sizes directly in units. Keep it neutral if sizing is percent-based.</td></tr>
+                            <tr><td><code>size_pct</code></td><td>Relative size.</td><td>Use it when position sizing is expressed as a percent. Do not populate both sizing styles with conflicting values.</td></tr>
+                            <tr><td><code>sl</code> and <code>tp</code></td><td>Protective exits.</td><td>Compute them from structure, ATR, or fixed multiple logic in the signal frame because they are part of the strategy intent.</td></tr>
+                            <tr><td><code>trail_offset</code></td><td>Trailing stop distance.</td><td>Populate it only when the strategy genuinely trails. Avoid placeholder values that imply a trailing regime when none exists.</td></tr>
+                            <tr><td><code>reduce_only</code></td><td>Reduce-only execution flag.</td><td>Use only when the strategy is explicitly flattening or reducing, not when opening fresh exposure.</td></tr>
+                            <tr><td><code>time_in_force</code></td><td>Order lifetime policy.</td><td>Use <code>GTC</code> as the portable default. Treat venue-specific TIFs as advanced and verify them against the actual live adapter.</td></tr>
+                            <tr><td><code>tag</code> and <code>comment</code></td><td>Debug metadata.</td><td>Use them to preserve signal family, filter state, or reason codes that will help you inspect strategy behavior later.</td></tr>
+                            <tr><td><code>alert_message</code></td><td>Per-row alert text.</td><td>Populate with a human-readable message on signal rows. The runtime forwards this to the alert dispatch surface. Leave it empty string on non-signal rows.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Order-type field bundle examples">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># MARKET
+frame["entry_order_type"] = "MARKET"
+frame["entry_price"] = frame["open"]
+
+# LIMIT
+frame["entry_order_type"] = "LIMIT"
+frame["entry_limit_price"] = frame["close"] * 0.998
+
+# STOP_MARKET
+frame["entry_order_type"] = "STOP_MARKET"
+frame["entry_trigger_price"] = frame["high"].rolling(5).max()
+
+# STOP_LIMIT
+frame["entry_order_type"] = "STOP_LIMIT"
+frame["entry_trigger_price"] = frame["high"].rolling(5).max()
+frame["entry_limit_price"] = frame["entry_trigger_price"] * 1.001</code></pre>
+                </div>
+                <div class="code-block" data-title="trade-frame fields in the canonical location">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["buy_signal"] = ta.crossover(frame["ema_fast"], frame["ema_slow"]).fillna(False)
+    frame["sell_signal"] = ta.crossunder(frame["ema_fast"], frame["ema_slow"]).fillna(False)
+
+    frame["entry_side"] = np.where(frame["buy_signal"], "BUY", np.where(frame["sell_signal"], "SELL", ""))
+    frame["entry_order_type"] = "MARKET"
+    frame["entry_price"] = frame["open"]
+    frame["quantity"] = 1.0
+    frame["size_pct"] = 0.0
+    frame["sl"] = frame["close"] - frame["atr"]
+    frame["tp"] = frame["close"] + (2.0 * frame["atr"])
+    frame["tag"] = np.where(frame["buy_signal"], "trend-long", np.where(frame["sell_signal"], "trend-short", ""))
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="code-block" data-title="strategy_alert_message plus trade-frame metadata">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import build_mapped_trade_frame, strategy, strategy_alert_message, ta
+
+
+strategy("Alert Template Strategy", overlay=True, process_orders_on_close=True)
+strategy_alert_message("{{ticker}} {{strategy.order.id}} {{strategy.order.action}}")
+
+
+def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    ema_fast = ta.ema(frame["close"], 9)
+    ema_slow = ta.ema(frame["close"], 21)
+    buy_signal = ta.crossover(ema_fast, ema_slow).fillna(False)
+    sell_signal = ta.crossunder(ema_fast, ema_slow).fillna(False)
+
+    frame["entry_side"] = np.where(buy_signal, "BUY", np.where(sell_signal, "SELL", ""))
+    frame["entry_price"] = frame["open"]
+    frame["quantity"] = 1.0
+    frame["size_pct"] = 0.0
+    frame["tag"] = np.where(buy_signal, "EMA-LONG", np.where(sell_signal, "EMA-SHORT", ""))
+    frame["alert_message"] = np.where(buy_signal | sell_signal, "ema crossover fired", "")
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="code-block" data-title="trade-frame wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: mapping stage invents prices and risk.
+def build_trade_frame(signal_df, params=None, styles=None):
+    frame = signal_df.copy()
+    frame["entry_price"] = frame["open"]
+    frame["sl"] = frame["close"] - 1.5
+    frame["tp"] = frame["close"] + 3.0
+    return build_mapped_trade_frame(frame)
+
+
+# Right: signal stage emits the intent, trade stage only maps it.
+def build_signal_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["entry_price"] = frame["open"]
+    frame["sl"] = frame["close"] - 1.5
+    frame["tp"] = frame["close"] + 3.0
+    return frame
+
+
+def build_trade_frame(signal_df, params=None, styles=None):
+    return build_mapped_trade_frame(signal_df)</code></pre>
+                </div>
+                <div class="callout">
+                    <strong>Execution realism lives in the declaration too:</strong> the current source tree includes dedicated examples for <code>slippage</code>, <code>commission_type</code>, <code>commission_value</code>, <code>margin_long</code>, <code>margin_short</code>, <code>pyramiding</code>, and <code>backtest_fill_limits_assumption</code>. Treat those as real authoring features, not hidden runtime flags.
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples-copybook.html#starter-strategy">Open strategy starter</a>
+                    <a class="copy-link" href="examples-copybook.html#strategy-order-types">Open strategy order-type examples</a>
+                    <a class="copy-link" href="examples/pynescript_strategy_alert_template_strategy.py" download>Download strategy alert template</a>
+                    <a class="copy-link" href="examples-copybook.html#mtf-strategy">Open MTF strategy example</a>
+                    <a class="copy-link" href="strategy-authoring-handbook.html#trade-frame-fields">Open trade-frame handbook</a>
+                    <a class="copy-link" href="../docs/trade_frame_sync_matrix.md">Open trade-frame sync matrix</a>
+                    <a class="copy-link" href="../docs/pynescript_trade_frame_order_lookup.md">Open trade-frame order lookup</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="plot-family-recipes" data-search="plot fill linefill plotshape plotbar plotchar plotarrow barcolor bgcolor fill_between recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>plot, plotbar, plotchar, plotarrow, barcolor, and fill Recipes</h2>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="card">
+                        <h3>What this section solves</h3>
+                        <p>Use this when you know the visual family name already but still need the exact mental model for what each argument refers to.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Most common confusion</h3>
+                        <p>Users often mix up dataframe column names, visual keys, and human-readable titles. This section separates those three clearly.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Fastest rule</h3>
+                        <p><code>source</code> usually means dataframe column, <code>key</code> means runtime identity, and <code>title</code> means the user-facing label.</p>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Function</th><th>What the first argument means</th><th>Use it when</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>plot(source, ...)</code></td><td>A dataframe column name created later in the frame builder.</td><td>You need a row-aligned line or series visual.</td></tr>
+                            <tr><td><code>plotbar(open, high, low, close, ...)</code></td><td>Four dataframe columns that already exist in the prepared frame.</td><td>You want OHLC bars without dropping to low-level candle routing.</td></tr>
+                            <tr><td><code>plotchar(series, ...)</code></td><td>A boolean or sparse series that decides where characters appear.</td><td>You want lightweight textual markers like <code>B</code>, <code>S</code>, or dots.</td></tr>
+                            <tr><td><code>plotarrow(series, ...)</code></td><td>A signed numeric strength series.</td><td>You want up/down arrow direction encoded in the series value itself.</td></tr>
+                            <tr><td><code>barcolor(series, ...)</code></td><td>A per-row color column.</td><td>You want to tint bars according to signal or regime state.</td></tr>
+                            <tr><td><code>bgcolor(series, ...)</code></td><td>A boolean or sparse activation series.</td><td>You want a session, state, or regime background band.</td></tr>
+                            <tr><td><code>fill(ref1, ref2, ...)</code></td><td>Two plot or hline references.</td><td>You want the space between two existing static declaration visuals.</td></tr>
+                            <tr><td><code>linefill.new(line1, line2, ...)</code></td><td>Two line identities, usually plot keys.</td><td>You want a persistent fill relationship between two named line visuals.</td></tr>
+                            <tr><td><code>plotshape(series, ...)</code></td><td>A boolean or sparse marker series.</td><td>You need point markers above, below, or at bars.</td></tr>
+                            <tr><td><code>ctx.atk.fill_between(...)</code></td><td>Two ATK bridge line keys.</td><td>You are already using <code>ctx.atk.plot_line</code> instead of static declarations.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Plot-family migration bundle">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>plotbar("open", "high", "low", "close", key="ohlc_surface", color="#2962ff")
+plotchar("breakout_signal", key="breakout_chars", char="B", location="abovebar", color="#00c853")
+plotarrow("trend_strength", key="trend_arrows", colorup="#00c853", colordown="#f23645")
+barcolor("bar_tint", key="bar_tint")
+bgcolor("session_bg_signal", key="session_bg", color="rgba(41,98,255,0.10)")</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="examples/pynescript_plot_visual_surface_indicator.py" download>Download plot-family example</a>
+                    <a class="copy-link" href="examples-copybook.html#plot-visual-surfaces">Open annotated example</a>
+                </div>
+                <div class="section-head">
+                    <p class="eyebrow">Deep dive</p>
+                    <h2>plot(...) Parameter Encyclopedia</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Function</th><th>Parameter</th><th>How to choose it</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>plot</code></td><td><code>source</code></td><td>Use the exact output column name that the frame builder will write. If the builder writes <code>frame["ub"]</code>, then <code>plot("ub", ...)</code> is the correct source.</td></tr>
+                            <tr><td><code>plot</code></td><td><code>key</code></td><td>Use a stable visual identity such as <code>bb_upper</code>. This is the name other visuals can reference later, including fills.</td></tr>
+                            <tr><td><code>plot</code></td><td><code>title</code></td><td>Use the human-readable legend label. Keep it short enough for chart legends and settings panels.</td></tr>
+                            <tr><td><code>plot</code></td><td><code>color</code></td><td>Use it for default styling only. Do not encode logic here that should live in a series or a separate user setting.</td></tr>
+                            <tr><td><code>plot</code></td><td><code>width</code></td><td>Use line width to show visual importance. A basis line might be thicker than its surrounding band boundaries.</td></tr>
+                            <tr><td><code>plotshape</code></td><td><code>series</code></td><td>Use a boolean or sparse marker column. The function should not be the place where the trigger condition is invented.</td></tr>
+                            <tr><td><code>plotshape</code></td><td><code>location</code></td><td>Choose based on where the marker should sit relative to the candle: <code>abovebar</code>, <code>belowbar</code>, or a more explicit anchored mode when supported.</td></tr>
+                            <tr><td><code>plotshape</code></td><td><code>style</code></td><td>Use a style that communicates meaning immediately. For example, a down label for sells and an up arrow for buys.</td></tr>
+                            <tr><td><code>linefill.new</code></td><td><code>line1</code>, <code>line2</code></td><td>Pass visual identities, usually plot keys. Do not pass dataframe column names here unless the runtime explicitly defines them as matching identities.</td></tr>
+                            <tr><td><code>linefill.new</code></td><td><code>color</code></td><td>Choose a translucent color so the fill supports the lines instead of hiding chart detail.</td></tr>
+                            <tr><td><code>ctx.atk.fill_between</code></td><td><code>line1</code>, <code>line2</code></td><td>Pass ATK bridge line keys created by <code>ctx.atk.plot_line</code>. This is the bridge-layer analog of static line fills.</td></tr>
+                            <tr><td><code>ctx.atk.fill_between</code></td><td><code>fill_alpha</code></td><td>Use alpha to control density. Keep it light unless the fill itself is the main message.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="plot(...) decoded line by line">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>plot(
+    "ub",                 # source: dataframe column name written later by the frame builder
+    key="bb_upper",       # key: stable runtime identity other visuals can reference
+    title="Upper Band",   # title: user-facing legend or settings label
+    color="#00aa00",      # color: default style, not the series logic itself
+    width=1,               # width: visual importance and readability
+)</code></pre>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card danger">
+                        <h3>Wrong</h3>
+                        <p>Using <code>plot("bb_upper", key="bb_upper", ...)</code> when the frame actually writes <code>frame["ub"]</code>. That confuses source and key.</p>
+                    </article>
+                    <article class="card success">
+                        <h3>Right</h3>
+                        <p>Use <code>plot("ub", key="bb_upper", ...)</code> and then write <code>frame["ub"] = ...</code> in the builder. The source matches the dataframe column and the key remains a separate visual identity.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="How plot and linefill connect in the BBands pattern">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>plot("lb", key="bb_lower", title="Lower", color="#ff0000", width=1)
+plot("cb", key="bb_basis", title="Basis", color="#ffa500", width=1)
+plot("ub", key="bb_upper", title="Upper", color="#00aa00", width=1)
+
+# linefill.new does not point to dataframe columns.
+# It points to the visual identities created by the plot declarations above.
+linefill.new("bb_lower", "bb_upper", key="bb_band_fill", color="rgba(63,57,100,0.44)")
+
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    upper, basis, lower = ta.bbands(frame["close"], length=20, std=2.0, mamode="sma")
+    frame["lb"] = lower.reset_index(drop=True)
+    frame["cb"] = basis.reset_index(drop=True)
+    frame["ub"] = upper.reset_index(drop=True)
+    return frame</code></pre>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="card">
+                        <h3>Common plot mistake</h3>
+                        <p>Writing <code>plot("bb_upper", ...)</code> when the dataframe column is actually <code>ub</code>. The source argument must match the dataframe output column, not the visual key.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Common linefill mistake</h3>
+                        <p>Passing <code>"ub"</code> and <code>"lb"</code> to <code>linefill.new</code> after setting keys to <code>bb_upper</code> and <code>bb_lower</code>. The fill is linking visual identities, not dataframe column labels.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Common plotshape mistake</h3>
+                        <p>Trying to calculate the trigger inside the declaration instead of preparing a series in the builder. Keep <code>plotshape</code> declarative.</p>
+                    </article>
+                </div>
+                <div class="section-head" id="plot-wrong-right">
+                    <p class="eyebrow">Wrong vs right</p>
+                    <h2>plotshape(...), linefill.new(...), and fill_between(...) by Contrast</h2>
+                </div>
+                <div class="code-block" data-title="plotshape wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: trying to invent the trigger inside the declaration mindset.
+# plotshape("close &gt; ema", ...)
+
+# Right: prepare the trigger column first.
+frame["buy_marker"] = (frame["close"] &gt; frame["ema_fast"]).fillna(False)
+plotshape("buy_marker", key="buy_marker", location="belowbar", style="arrow_up", color="#00c853", text="BUY")</code></pre>
+                </div>
+                <div class="code-block" data-title="linefill.new wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: passing dataframe columns instead of visual identities.
+# linefill.new("ub", "lb", key="bb_fill", color="rgba(63,57,100,0.44)")
+
+# Right: pass the plot keys created by the declarations.
+plot("lb", key="bb_lower", title="Lower", color="#ff0000", width=1)
+plot("ub", key="bb_upper", title="Upper", color="#00aa00", width=1)
+linefill.new("bb_lower", "bb_upper", key="bb_fill", color="rgba(63,57,100,0.44)")</code></pre>
+                </div>
+                <div class="code-block" data-title="ctx.atk.fill_between wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: mixing static line identities with bridge line identities.
+# ctx.atk.fill_between(line1="bb_upper", line2="bb_lower", ...)
+
+# Right: fill between lines that were created through ctx.atk.plot_line.
+ctx.atk.plot_line(key="atk_fast_line", source="fast", color="#00c853")
+ctx.atk.plot_line(key="atk_slow_line", source="slow", color="#f23645")
+ctx.atk.fill_between(
+    key="atk_fast_slow_fill",
+    line1="atk_fast_line",
+    line2="atk_slow_line",
+    color="rgba(41,98,255,0.12)",
+    fill_alpha=31,
+)</code></pre>
+                </div>
+                <div class="code-block" data-title="plotshape as a marker declaration rather than a calculation">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import indicator, plotshape
+
+
+indicator("Annotated Shape Example", overlay=True, max_bars_back=240)
+
+# plotshape reads a prepared boolean series named shape_trigger.
+plotshape("shape_trigger", key="shape_trigger", title="Trigger", location="abovebar", style="labeldown", color="#AA0000", text="SELL")
+
+
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["shape_trigger"] = [(i % 5) == 0 for i in range(len(frame))]
+    return frame</code></pre>
+                </div>
+                <div class="code-block" data-title="ATK bridge alternative with plot_line and fill_between">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_visuals(frame, params=None, ctx=None):
+    return [
+        ctx.atk.plot_line(key="atk_fast_line", source="fast", color="#00c853"),
+        ctx.atk.plot_line(key="atk_slow_line", source="slow", color="#f23645"),
+        ctx.atk.fill_between(
+            key="atk_fast_slow_fill",
+            line1="atk_fast_line",
+            line2="atk_slow_line",
+            color="rgba(41,98,255,0.12)",
+            fill_alpha=31,
+        ),
+    ]</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                </section>
+
+                <section class="doc-section" id="table-recipes" data-search="table recipes table.new table.cell ctx.table dashboard">
+                    <div class="section-head">
+                        <p class="eyebrow">Visual functions</p>
+                        <h2>table.new(...), table.cell(...), and ctx.table Recipes</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Surface</th><th>Use it when</th><th>Recommended stage</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>table.new(...)</code></td><td>The table structure is static and can be declared once at import time.</td><td>Module scope or render stage for simple widgets.</td></tr>
+                                <tr><td><code>table.cell(...)</code></td><td>You want to populate or refresh cell content on a managed table handle.</td><td>Render stage when values depend on the current frame slice.</td></tr>
+                                <tr><td><code>ctx.table.new(...)</code></td><td>You want a runtime-created table derived from the current frame slice.</td><td><code>build_visuals(...)</code> only.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="code-block" data-title="Native table pattern">
+    <button class="copy-button" type="button">Copy</button>
+    <pre><code>dashboard = table.new("top_right", 2, 3, key="dashboard", title="Summary")
+    table.cell(dashboard, 0, 0, "Metric")
+    table.cell(dashboard, 1, 0, "Value")
+
+
+    def build_visuals(frame, params=None, ctx=None):
+        runtime_table = ctx.table.new("bottom_left", 2, 2, key="runtime_dashboard", title="Runtime")
+        ctx.table.cell(runtime_table, 0, 0, "Bars")
+        ctx.table.cell(runtime_table, 1, 0, str(len(frame)))
+        return runtime_table</code></pre>
+                    </div>
+                    <div class="copy-grid compact-grid">
+                        <a class="copy-link" href="examples/pynescript_native_table_indicator.py" download>Download native table example</a>
+                        <a class="copy-link" href="examples-copybook.html#native-table">Open annotated example</a>
+                    </div>
+                    <a class="copy-link" href="examples/pynescript_bbands_fill_indicator.py" download>Download BBands example</a>
+                    <a class="copy-link" href="examples/pynescript_plot_shape_above.py" download>Download plotshape example</a>
+                    <a class="copy-link" href="examples/pynescript_atk_plot_fill_bridge.py" download>Download ATK fill bridge example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="visual-decision-tree" data-search="decision tree choose plot linefill plotshape ctx atk">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>Visual API Decision Tree</h2>
+                </div>
+                <div class="code-block" data-title="Which visual API should you choose?">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>Need to draw something?
+|
++-- Does each bar naturally map to one series value or marker?
+|   |
+|   +-- Yes
+|   |   |
+|   |   +-- Need a line or series? -> use plot(...)
+|   |   +-- Need a fixed threshold? -> use hline(...)
+|   |   +-- Need a marker? -> use plotshape(...), plotchar(...), or plotarrow(...)
+|   |   +-- Need the space between two static lines? -> use fill(...) or linefill.new(...)
+|   |
+|   +-- No
+|       |
+|       +-- Is it an explicit chart object like a line, label, or box? -> use ctx.line / ctx.label / ctx.box
+|       +-- Is it an ATK-native composite like a table, zone batch, or profile? -> use ctx.atk.*
+|
++-- Already using ctx.atk.plot_line for the lines?
+    |
+    +-- Yes -> use ctx.atk.fill_between(...)
+    +-- No -> keep static declarations and use fill(...) or linefill.new(...)</code></pre>
+                </div>
+                <div class="callout">
+                    <strong>Shortcut:</strong> if the first thing you think is “I just need one more dataframe column”, stay in the static declaration family. If the first thing you think is “I need an object” or “I need a grouped payload”, move to <code>ctx.*</code> or <code>ctx.atk.*</code>.
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="visual-authoring-handbook.html">Open visual authoring handbook</a>
+                    <a class="copy-link" href="visual-authoring-handbook.html#layer-choice">Open layer-choice guide</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="build-visuals-wrong-right" data-search="build_visuals wrong right render only attrs stale ctx atk visual contract">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>build_visuals(...) Wrong vs Right</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card danger">
+                        <h3>Wrong</h3>
+                        <p>Computing indicators, calling <code>request.security</code>, mutating the frame, or relying entirely on stale slice-dependent attrs payloads inside <code>build_visuals</code>.</p>
+                    </article>
+                    <article class="card success">
+                        <h3>Right</h3>
+                        <p>Prepare data in the frame builder, store only static config in <code>frame.attrs</code> when needed, then derive current anchors from the frame passed into <code>build_visuals</code> and emit object intents through <code>ctx.*</code> or <code>ctx.atk.*</code>.</p>
+                    </article>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Element</th><th>Meaning</th><th>How to choose it</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>frame</code></td><td>The already-prepared current slice to render from.</td><td>Assume it already contains every computed series you need. Read from it, but do not mutate it.</td></tr>
+                            <tr><td><code>params</code></td><td>Resolved runtime inputs.</td><td>Use it only for render decisions that were intentionally exposed as parameters, not as a back door for delayed computation.</td></tr>
+                            <tr><td><code>ctx</code></td><td>The visual intent gateway.</td><td>Choose <code>ctx.line</code>, <code>ctx.label</code>, <code>ctx.box</code> for object visuals and <code>ctx.atk.*</code> for richer ATK-native composites.</td></tr>
+                            <tr><td><code>frame.attrs</code></td><td>Optional static config carrier.</td><td>Store colors, labels, headers, or other stable config here. Recompute dynamic anchors from the actual frame passed in.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="build_visuals wrong vs right">
+<button class="copy-button" type="button">Copy</button>
+<pre><code># Wrong: doing compute and stale payload construction in the render stage.
+def build_visuals(frame, params=None, ctx=None):
+    if frame is None or frame.empty or ctx is None:
+        return None
+    frame["ema_fast"] = ta.ema(frame["close"], 20)
+    payload = dict(frame.attrs.get("box_payload") or {})
+    return ctx.box.new(key="range_box", **payload)
+
+
+# Right: compute in the builder, keep attrs static, derive anchors from the live frame slice.
+def build_indicator_frame(df, params=None):
+    frame = df.copy().reset_index(drop=True)
+    frame["ema_fast"] = ta.ema(frame["close"], 20)
+    frame.attrs["box_style"] = {"bgcolor": "rgba(41,98,255,0.08)", "border_color": "#2962ff"}
+    return frame
+
+
+def build_visuals(frame, params=None, ctx=None):
+    if frame is None or frame.empty or ctx is None:
+        return None
+    last = frame.iloc[-1]
+    anchor = frame.iloc[max(len(frame) - 10, 0)]
+    style = dict(frame.attrs.get("box_style") or {})
+    return ctx.box.new(
+        key="range_box",
+        left=int(anchor["index"]),
+        top=float(last["high"]),
+        right=int(last["index"]),
+        bottom=float(last["low"]),
+        **style,
+    )</code></pre>
+                </div>
+                <div class="copy-grid compact-grid">
+                    <a class="copy-link" href="visual-authoring-handbook.html#render-only">Open render-only handbook section</a>
+                    <a class="copy-link" href="visual-authoring-handbook.html#attrs-slice-safety">Open attrs slice-safety section</a>
+                    <a class="copy-link" href="examples-copybook.html#visual-starter">Open visual starter example</a>
+                </div>
+            </section>
+
+            <section class="doc-section" id="chart-point-recipes" data-search="chart point from index from time recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>chart.point Recipes</h2>
+                </div>
+                <div class="card-grid two-up">
+                    <article class="card">
+                        <h3><code>from_index</code></h3>
+                        <p>Use this when the object should track bar positions by chart index. It is usually the simplest default for projected lines and local zones.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>from_time</code></h3>
+                        <p>Use this when the anchor must follow an absolute timestamp rather than the current visible index layout.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="chart.point with line and box objects">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>from source import box, chart, line
+
+
+# Index-based anchors are easiest when the object is local to recent bars.
+trend = line.new(
+    chart.point.from_index(10, 100.0),
+    chart.point.from_index(20, 105.0),
+    key="trend_line",
+    color="#2962ff",
+)
+
+# Time-based anchors are useful when you already know the exact timestamp to attach to.
+line.set_xy2(trend, chart.point.from_time(1700000600, 106.0))
+
+zone = box.new(
+    chart.point.from_index(12, 108.0),
+    chart.point.from_index(20, 99.0),
+    key="zone_box",
+    text="ZONE",
+    bgcolor="rgba(41,98,255,0.08)",
+)</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="object-recipes" data-search="line label box object methods recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>line, label, and box Recipes</h2>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Namespace</th><th>Best first methods</th><th>What to remember</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>line</code></td><td><code>new</code>, <code>set_xy1</code>, <code>set_xy2</code>, <code>set_color</code></td><td>Use stable keys if the same conceptual object should persist and update.</td></tr>
+                            <tr><td><code>label</code></td><td><code>new</code>, <code>set_text</code>, <code>set_color</code></td><td>Choose labels when a point needs a message, not just a marker.</td></tr>
+                            <tr><td><code>box</code></td><td><code>new</code>, <code>set_lefttop</code>, <code>set_rightbottom</code>, <code>set_bgcolor</code></td><td>Boxes are best for zones and ranges, not simple one-point annotations.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block" data-title="Object namespace recipe inside build_visuals">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_visuals(frame, params=None, ctx=None):
+    if frame is None or frame.empty or ctx is None:
+        return None
+
+    last = frame.iloc[-1]
+    anchor = frame.iloc[max(len(frame) - 10, 0)]
+
+    ctx.label.new(
+        key="last_close_label",
+        x=int(last["index"]),
+        y=float(last["close"]),
+        text="LAST",
+        color="#2962ff",
+        style="label_down",
+    )
+
+    range_box = ctx.box.new(
+        key="recent_range_box",
+        left=int(anchor["index"]),
+        top=float(last["high"]),
+        right=int(last["index"]),
+        bottom=float(last["low"]),
+        bgcolor="rgba(41,98,255,0.08)",
+    )
+
+    ctx.box.set_lefttop(range_box, x=int(anchor["index"]), y=float(last["high"] + 0.5))
+    return ctx.line.new(
+        key="close_slope_line",
+        x1=int(anchor["index"]),
+        y1=float(anchor["close"]),
+        x2=int(last["index"]),
+        y2=float(last["close"]),
+        color="#ffd600",
+    )</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" id="bridge-recipes" data-search="ctx atk bridge table rectangles volume profile recipes">
+                <div class="section-head">
+                    <p class="eyebrow">Visual functions</p>
+                    <h2>ctx.atk.* Bridge Recipes</h2>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="card">
+                        <h3><code>ctx.atk.table</code></h3>
+                        <p>Use for dashboards and summary cards. Build the payload in the frame builder and render it here.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>ctx.atk.rectangles</code></h3>
+                        <p>Use for grouped support, resistance, or regime zones that belong together as a batch.</p>
+                    </article>
+                    <article class="card">
+                        <h3><code>ctx.atk.volume_profile</code></h3>
+                        <p>Use only after the profile payload already exists. This function renders; it should not calculate the profile.</p>
+                    </article>
+                </div>
+                <div class="code-block" data-title="Bridge helper selection by output shape">
+<button class="copy-button" type="button">Copy</button>
+<pre><code>def build_visuals(frame, params=None, ctx=None):
+    if frame is None or frame.empty or ctx is None:
+        return None
+
+    table_payload = dict(frame.attrs.get("visual_table_payload") or {})
+    zone_payload = dict(frame.attrs.get("visual_zone_payload") or {})
+    profile_payload = dict(frame.attrs.get("volume_profile_payload") or {})
+
+    outputs = []
+    if table_payload:
+        outputs.append(ctx.atk.table(key="summary_table", **table_payload))
+    if zone_payload:
+        outputs.append(ctx.atk.rectangles(key="zone_batch", **zone_payload))
+    if profile_payload:
+        outputs.append(ctx.atk.volume_profile(profile_payload, key="volume_profile", orient="right"))
+    return outputs</code></pre>
+                </div>
+            </section>
+        </main>
+
+        <aside class="toc">
+            <p class="eyebrow">On this page</p>
+            <nav id="toc-nav"></nav>
+        </aside>
+    </div>
+
+    <script src="assets/app.js"></script>
+</body>
+</html>
